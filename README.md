@@ -21,6 +21,7 @@ Work in progress 🚧
 
 ### Technologies used
 - Go
+- SQLite
 
 ### Contributing
 Work in progress 🚧
