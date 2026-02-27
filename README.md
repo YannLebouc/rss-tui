@@ -11,17 +11,27 @@ An RSS feed reader inside your terminal, retrieves data from multiples feeds to 
 - License
 
 ### Features
+
 Manage feeds (add/remove/list)
+
 Manual refresh
+
 Unread/read tracking
+
 Keyboard-driven TUI navigation
+
 Local storage (config + state)
 
 #### Planned
+
 Categories/tags for feeds
+
 Global “Unread” view
+
 Sorting/filtering
+
 OPML import/export
+
 Auto-refresh
 
 ### Installation
