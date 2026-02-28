@@ -30,7 +30,9 @@ Work in progress 🚧
 
 ### Usage
 Work in progress 🚧
-
+- Set your RSS URLs in a single `feeds` file like so `.config/rss-tui/feeds` or in your `XDG_CONFIG_HOME` path
+  - Each line is a single URL
+ 
 ### Technologies used
 - Go
 - SQLite
