@@ -12,7 +12,14 @@ func main(){
     log.SetPrefix("file reader: ")
     log.SetFlags(0)
 
-	file, err := os.Open("/home/ylebouc/dotfiles/rss-tui/feeds")
+    type rssURL struct {
+    	url string
+    	tag string
+    }
+
+	rssUrls := make([]rssURL, 3)
+
+	file, err := os.Open("/home/ylebouc/dotfiles/common/rss-tui/feeds")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -21,9 +28,17 @@ func main(){
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		fmt.Println(scanner.Text())
+		rssUrl := rssURL{
+			url: scanner.Text(),
+			tag: "",
+		}
+		rssUrls = append(rssUrls, rssUrl)
 	}
 
+	for _, value := range(rssUrls) {
+		fmt.Println(value)
+	}
+	
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
