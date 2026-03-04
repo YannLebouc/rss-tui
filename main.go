@@ -17,7 +17,7 @@ func main(){
     	tag string
     }
 
-	rssUrls := make([]rssURL, 3)
+	rssUrls := []rssURL {}
 
 	file, err := os.Open("/home/ylebouc/dotfiles/common/rss-tui/feeds")
 	if err != nil {
