@@ -9,7 +9,6 @@ import (
 )
 
 func main(){
-	// fmt.Println("Hello World.")
     log.SetPrefix("file reader: ")
     log.SetFlags(0)
 
