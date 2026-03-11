@@ -1,52 +1,59 @@
 package main
 
 import (
-	"fmt"
-	"os"
 	"bufio"
+	"fmt"
 	"log"
+	"os"
 	"time"
 )
 
-func main(){
-    log.SetPrefix("file reader: ")
-    log.SetFlags(0)
+func main() {
+	log.SetPrefix("file reader: ")
+	log.SetFlags(0)
 
-    type rssURL struct {
-    	url string
-    	tag string
-    }
-
-    type channelImage struct {
-    	url string
-    	title string
-    	link string
-    	width int
-    	height int
-    	description string
-    }
-
-    type rssItem struct {
-    	author string
-    	categories []string
-    	comments string
-    	guid string
-    	publicationDate time.Time
-    	source string
-    }
-
-    type rssChannel struct {
-		title string
-		description string
-		link string
-		language string
-		copyright string
-		publicationDate time.Time
-		lastBuildDate time.Time
-		categories []string
-		image channelImage
+	type FeedURL struct {
+		url string
+		tag string
 	}
-	rssUrls := []rssURL {}
+
+	type ChannelImage struct {
+		url         string
+		title       string
+		link        string
+		width       int
+		height      int
+		description string
+	}
+
+	type Item struct {
+		author          string
+		categories      []string
+		comments        string
+		guid            string
+		publicationDate time.Time
+		source          string
+	}
+
+	type Channel struct {
+		title           string
+		description     string
+		link            string
+		language        string
+		copyright       string
+		publicationDate time.Time
+		lastBuildDate   time.Time
+		categories      []string
+		image           ChannelImage
+	}
+
+	type Feed struct {
+		rssUrl  FeedURL
+		channel Channel
+		items   []Item
+	}
+
+	rssUrls := []FeedURL{}
 
 	file, err := os.Open("/home/ylebouc/dotfiles/common/rss-tui/feeds")
 	if err != nil {
@@ -57,17 +64,21 @@ func main(){
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		rssUrl := rssURL{
+		rssUrl := FeedURL{
 			url: scanner.Text(),
 			tag: "",
 		}
 		rssUrls = append(rssUrls, rssUrl)
 	}
 
-	for _, value := range(rssUrls) {
-		fmt.Println(value)
-	}
-	
+	// Isolating an rss feed for easier implementation
+
+	rssUrl := rssUrls[0]
+	fmt.Println(rssUrl.url)
+	// for _, value := range rssUrls {
+	// 	fmt.Println(value)
+	// }
+
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
