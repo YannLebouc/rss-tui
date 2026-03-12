@@ -23,7 +23,7 @@ Goal: allow users to define feeds.
 
 - [x] Decide config file location (`~/.config/rss-tui/feeds`)
 - [x] Implement config loader
-- [ ] Support one feed URL per line
+- [x] Support one feed URL per line
 - [ ] Ignore empty lines
 - [ ] Ignore comments (`#`)
 - [ ] Add optional tag parsing
@@ -39,7 +39,7 @@ https://blog.golang.org/feed.xml go programming
 - [x] Define what should be stored from an rss feed
 - [x] Create
 - [x] Create `Feed`, `Channel`, `Item`, `ChannelImage`, `FeedUrl` structs
-- [ ] Store URL
+- [x] Store URL
 - [ ] Store optional tags
 - [ ] Store title (optional for now)
 
