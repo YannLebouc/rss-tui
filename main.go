@@ -5,17 +5,13 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 )
 
 func main() {
 	log.SetPrefix("file reader: ")
 	log.SetFlags(0)
-
-	type FeedURL struct {
-		url string
-		tag string
-	}
 
 	type ChannelImage struct {
 		url         string
@@ -48,14 +44,23 @@ func main() {
 	}
 
 	type Feed struct {
-		rssUrl  FeedURL
+		url     string
+		tags    []string
 		channel Channel
 		items   []Item
 	}
 
-	rssUrls := []FeedURL{}
+	feeds := []Feed{}
 
-	file, err := os.Open("/home/ylebouc/dotfiles/common/rss-tui/feeds")
+	// find the best way to get the path of the feeds file on any system, using os package to get the home directory for example
+	userHomeDir, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	filepath := filepath.Join(userHomeDir, ".config", "rss-tui", "feeds")
+	
+	file, err := os.Open(filepath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,22 +69,19 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		rssUrl := FeedURL{
-			url: scanner.Text(),
-			tag: "",
+		feed := Feed{
+			url:  scanner.Text(),
+			tags: []string{},
 		}
-		rssUrls = append(rssUrls, rssUrl)
+		feeds = append(feeds, feed)
 	}
-
-	// Isolating an rss feed for easier implementation
-
-	rssUrl := rssUrls[0]
-	fmt.Println(rssUrl.url)
-	// for _, value := range rssUrls {
-	// 	fmt.Println(value)
-	// }
 
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
+	// Isolating an rss feed for easier implementation
+
+	feed := feeds[0]
+	fmt.Println(feed.url)
 }
+
