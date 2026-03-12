@@ -6,8 +6,22 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
+
+func ParseConfigurationLine(line string) (url string, tags []string, err error) {
+
+	if line == "" {
+		return
+	}
+
+	if trimmedLine := strings.TrimSpace(line[0:1]); trimmedLine == "#" {
+		return
+	}
+
+	return url, tags, nil
+}
 
 func main() {
 	log.SetPrefix("file reader: ")
@@ -59,7 +73,7 @@ func main() {
 	}
 
 	filepath := filepath.Join(userHomeDir, ".config", "rss-tui", "feeds")
-	
+
 	file, err := os.Open(filepath)
 	if err != nil {
 		log.Fatal(err)
@@ -84,4 +98,3 @@ func main() {
 	feed := feeds[0]
 	fmt.Println(feed.url)
 }
-
