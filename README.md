@@ -30,9 +30,17 @@ Work in progress 🚧
 
 ### Usage
 Work in progress 🚧
-- Set your RSS URLs in a single `feeds` file like so `.config/rss-tui/feeds` or in your `XDG_CONFIG_HOME` path
-  - Each line is a single URL
- 
+
+#### Setup your RSS feeds in a configuration file 
+You will find a `feeds` file template with guidelines at the root of this repository
+
+##### Linux
+- The path of your `feeds` file should be : `$HOME/.config/rss-tui/feeds`.
+- You might also use `$XDG_CONFIG_HOME/rss-tui/feeds` path based on your preference
+
+##### Windows
+- The path of your `feeds` file should be : `%USERPROFILE%\.config\rss-tui\feeds`.
+
 ### Technologies used
 - Go
 - SQLite
