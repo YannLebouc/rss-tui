@@ -24,9 +24,9 @@ Goal: allow users to define feeds.
 - [x] Decide config file location (`~/.config/rss-tui/feeds`)
 - [x] Implement config loader
 - [x] Support one feed URL per line
-- [ ] Ignore empty lines
-- [ ] Ignore comments (`#`)
-- [ ] Add optional tag parsing
+- [x] Ignore empty lines
+- [x] Ignore comments (`#`)
+- [x] Add optional tag parsing
 
 Example:
 
