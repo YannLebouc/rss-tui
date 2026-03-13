@@ -2,12 +2,12 @@ package main
 
 import (
 	"bufio"
+	"encoding/xml"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
 func ParseConfigurationLine(line string) (url string, tags []string) {
@@ -35,41 +35,23 @@ func main() {
 	log.SetPrefix("file reader: ")
 	log.SetFlags(0)
 
-	type ChannelImage struct {
-		url         string
-		title       string
-		link        string
-		width       int
-		height      int
-		description string
-	}
-
 	type Item struct {
-		author          string
-		categories      []string
-		comments        string
-		guid            string
-		publicationDate time.Time
-		source          string
+		Title       string `xml:"title"`
+		Description string `xml:"description"`
 	}
 
 	type Channel struct {
-		title           string
-		description     string
-		link            string
-		language        string
-		copyright       string
-		publicationDate time.Time
-		lastBuildDate   time.Time
-		categories      []string
-		image           ChannelImage
+		Title       string `xml:"title"`
+		Description string `xml:"description"`
+		Link        string `xml:"link"`
+		Items       []Item `xml:"item"`
 	}
 
 	type Feed struct {
-		url     string
-		tags    []string
-		channel Channel
-		items   []Item
+		Url     string   `xml:"-"`
+		Tags    []string `xml:"-"`
+		XMLName xml.Name `xml:"rss"`
+		Channel Channel  `xml:"channel"`
 	}
 
 	feeds := []Feed{}
@@ -93,8 +75,8 @@ func main() {
 		url, tags := ParseConfigurationLine(scanner.Text())
 		if url != "" && len(tags) > 0 {
 			feed := Feed{
-				url:  url,
-				tags: tags,
+				Url:  url,
+				Tags: tags,
 			}
 			feeds = append(feeds, feed)
 		}
@@ -105,8 +87,8 @@ func main() {
 	}
 
 	for _, feed := range feeds {
-		fmt.Println(feed.url)
-		fmt.Println(feed.tags)
+		fmt.Println(feed.Url)
+		fmt.Println(feed.Tags)
 	}
 
 	// Isolating an rss feed for easier implementation
