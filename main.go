@@ -10,17 +10,25 @@ import (
 	"time"
 )
 
-func ParseConfigurationLine(line string) (url string, tags []string, err error) {
+func ParseConfigurationLine(line string) (url string, tags []string) {
 
 	if line == "" {
-		return
+		return "", nil
 	}
 
 	if trimmedLine := strings.TrimSpace(line[0:1]); trimmedLine == "#" {
-		return
+		return "", nil
 	}
 
-	return url, tags, nil
+	stringParts := strings.Split(line, " ")
+	if len(stringParts) > 0 {
+		url = stringParts[0]
+		if len(stringParts) > 1 {
+			tags = stringParts[1:]
+		}
+	}
+
+	return url, tags
 }
 
 func main() {
@@ -66,7 +74,6 @@ func main() {
 
 	feeds := []Feed{}
 
-	// find the best way to get the path of the feeds file on any system, using os package to get the home directory for example
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal(err)
@@ -83,18 +90,24 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		feed := Feed{
-			url:  scanner.Text(),
-			tags: []string{},
+		url, tags := ParseConfigurationLine(scanner.Text())
+		if url != "" && len(tags) > 0 {
+			feed := Feed{
+				url:  url,
+				tags: tags,
+			}
+			feeds = append(feeds, feed)
 		}
-		feeds = append(feeds, feed)
 	}
 
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
-	// Isolating an rss feed for easier implementation
 
-	feed := feeds[0]
-	fmt.Println(feed.url)
+	for _, feed := range feeds {
+		fmt.Println(feed.url)
+		fmt.Println(feed.tags)
+	}
+
+	// Isolating an rss feed for easier implementation
 }
