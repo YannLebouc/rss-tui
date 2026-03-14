@@ -32,8 +32,6 @@ func ParseConfigurationLine(line string) (url string, tags []string) {
 }
 
 func main() {
-	log.SetPrefix("file reader: ")
-	log.SetFlags(0)
 
 	type Item struct {
 		Title       string `xml:"title"`
@@ -54,8 +52,6 @@ func main() {
 		Channel Channel  `xml:"channel"`
 	}
 
-	feeds := []Feed{}
-
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal(err)
@@ -70,14 +66,20 @@ func main() {
 
 	defer file.Close()
 
+	feeds := []Feed{}
+
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		url, tags := ParseConfigurationLine(scanner.Text())
-		if url != "" && len(tags) > 0 {
+		if url != "" {
 			feed := Feed{
-				Url:  url,
-				Tags: tags,
+				Url: url,
 			}
+
+			if len(tags) > 0 {
+				feed.Tags = tags[0:]
+			}
+
 			feeds = append(feeds, feed)
 		}
 	}
