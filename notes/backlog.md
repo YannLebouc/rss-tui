@@ -40,8 +40,8 @@ https://blog.golang.org/feed.xml go programming
 - [x] Create
 - [x] Create `Feed`, `Channel`, `Item`, `ChannelImage`, `FeedUrl` structs
 - [x] Store URL
-- [ ] Store optional tags
-- [ ] Store title (optional for now)
+- [x] Store optional tags
+- [x] Store mandatory fields for an RSS feed
 
 ---
 
