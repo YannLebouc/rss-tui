@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/xml"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -99,13 +100,23 @@ func main() {
 		log.Fatal(err)
 	}
 
-	rssFeedScanner := bufio.NewScanner(response.Body)
+	body, err := io.ReadAll(response.Body)
 
-	for i := 0; rssFeedScanner.Scan() && i < 10; i++ {
-		fmt.Printf("ligne %d : %s\n", i, rssFeedScanner.Text())
-	}
+	rssFeed := Feed{}
+
+	xml.Unmarshal(body, &rssFeed)
+
+	fmt.Println("CHANNEL TITLE : " + rssFeed.Channel.Title)
+	fmt.Println("CHANNEL DESCRIPTION : " + rssFeed.Channel.Description)
+	fmt.Println(rssFeed.Channel.Items)
+
+	// rssFeedScanner := bufio.NewScanner(response.Body)
+
+	// for i := 0; rssFeedScanner.Scan() && i < 10; i++ {
+	// 	fmt.Printf("ligne %d : %s\n", i, rssFeedScanner.Text())
+	// }
 
 	defer response.Body.Close()
 
-	fmt.Println("Response status:", response.Status)
+	// fmt.Println("Response status:", response.Status)
 }
