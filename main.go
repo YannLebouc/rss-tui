@@ -77,7 +77,7 @@ func main() {
 			}
 
 			if len(tags) > 0 {
-				feed.Tags = tags[0:]
+				feed.Tags = tags
 			}
 
 			feeds = append(feeds, feed)
