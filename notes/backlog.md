@@ -51,8 +51,8 @@ Goal: download RSS feeds from URLs.
 
 ### HTTP fetch
 
-- [ ] Implement HTTP client
-- [ ] Fetch feed from URL
+- [x] Implement HTTP client
+- [x] Fetch feed from URL
 - [ ] Handle HTTP errors
 - [ ] Handle timeouts
 - [ ] Return raw feed content
