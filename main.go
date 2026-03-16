@@ -65,9 +65,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer file.Close()
 
 	feeds := []Feed{}
-
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		url, tags := ParseConfigurationLine(scanner.Text())
@@ -88,19 +88,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	defer file.Close()
-	// for _, feed := range feeds {
-	// 	fmt.Println(feed.Url)
-	// 	fmt.Println(feed.Tags)
-	// }
-
 	response, err := http.Get(feeds[0].Url)
+	body, err := io.ReadAll(response.Body)
+	response.Body.Close()
+
+	if response.StatusCode > 299 {
+		log.Fatalf("Response failed with status code %d and body %s\n", response.StatusCode, body)
+	}
 
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	body, err := io.ReadAll(response.Body)
 
 	rssFeed := Feed{}
 
@@ -109,14 +107,4 @@ func main() {
 	fmt.Println("CHANNEL TITLE : " + rssFeed.Channel.Title)
 	fmt.Println("CHANNEL DESCRIPTION : " + rssFeed.Channel.Description)
 	fmt.Println(rssFeed.Channel.Items)
-
-	// rssFeedScanner := bufio.NewScanner(response.Body)
-
-	// for i := 0; rssFeedScanner.Scan() && i < 10; i++ {
-	// 	fmt.Printf("ligne %d : %s\n", i, rssFeedScanner.Text())
-	// }
-
-	defer response.Body.Close()
-
-	// fmt.Println("Response status:", response.Status)
 }
