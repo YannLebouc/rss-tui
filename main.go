@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -64,8 +65,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	defer file.Close()
-
 	feeds := []Feed{}
 
 	scanner := bufio.NewScanner(file)
@@ -88,10 +87,25 @@ func main() {
 		log.Fatal(err)
 	}
 
-	for _, feed := range feeds {
-		fmt.Println(feed.Url)
-		fmt.Println(feed.Tags)
+	defer file.Close()
+	// for _, feed := range feeds {
+	// 	fmt.Println(feed.Url)
+	// 	fmt.Println(feed.Tags)
+	// }
+
+	response, err := http.Get(feeds[0].Url)
+
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	// Isolating an rss feed for easier implementation
+	rssFeedScanner := bufio.NewScanner(response.Body)
+
+	for i := 0; rssFeedScanner.Scan() && i < 10; i++ {
+		fmt.Printf("ligne %d : %s\n", i, rssFeedScanner.Text())
+	}
+
+	defer response.Body.Close()
+
+	fmt.Println("Response status:", response.Status)
 }
