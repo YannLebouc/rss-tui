@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 func ParseConfigurationLine(line string) (url string, tags []string) {
@@ -38,8 +39,8 @@ func main() {
 	type Item struct {
 		Title       string `xml:"title"`
 		Description string `xml:"description"`
-		// Link        string `xml:"link"`
-		// PubDate     time.Time `xml:"pubDate"`
+		Link        string `xml:"link"`
+		PubDate     time.Time `xml:"pubDate"`
 	}
 
 	type Channel struct {
@@ -104,15 +105,17 @@ func main() {
 
 	rssFeed := Feed{}
 
-	xml.Unmarshal(body, &rssFeed)
-
+	if err := xml.Unmarshal(body, &rssFeed); err != nil {
+		log.Fatal(err)
+	}
+	
 	fmt.Println("CHANNEL TITLE : " + rssFeed.Channel.Title)
 	fmt.Println("CHANNEL DESCRIPTION : " + rssFeed.Channel.Description)
-	// fmt.Println(rssFeed.Channel.Items)
-	for _, feed := range rssFeed.Channel.Items {
-		fmt.Println("feed title : " + feed.Title)
-		// fmt.Println("feed link : " + feed.Link)
-		fmt.Println("feed description : " + feed.Description)
-		// fmt.Println("feed pubDate : " + feed.PubDate.String())
-	}
+	fmt.Println(rssFeed.Channel.Items)
+	// for _, feed := range rssFeed.Channel.Items {
+	// 	fmt.Println("feed title : " + feed.Title)
+	// 	fmt.Println("feed link : " + feed.Link)
+	// 	fmt.Println("feed description : " + feed.Description)
+	// 	fmt.Println("feed pubDate : " + feed.PubDate.String())
+	// }
 }
