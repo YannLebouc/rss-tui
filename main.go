@@ -14,15 +14,6 @@ import (
 )
 
 func ParseConfigurationLine(line string) (url string, tags []string) {
-
-	if line == "" {
-		return "", nil
-	}
-
-	if trimmedLine := strings.TrimSpace(line[0:1]); trimmedLine == "#" {
-		return "", nil
-	}
-
 	stringParts := strings.Split(line, " ")
 	if len(stringParts) > 0 {
 		url = stringParts[0]
@@ -34,46 +25,92 @@ func ParseConfigurationLine(line string) (url string, tags []string) {
 	return url, tags
 }
 
-func main() {
-
-	type Item struct {
-		Title       string `xml:"title"`
-		Description string `xml:"description"`
-		Link        string `xml:"link"`
-		PubDate     time.Time `xml:"pubDate"`
-	}
-
-	type Channel struct {
-		Title       string `xml:"title"`
-		Description string `xml:"description"`
-		Link        string `xml:"link"`
-		Items       []Item `xml:"item"`
-	}
-
-	type Feed struct {
-		Url     string   `xml:"-"`
-		Tags    []string `xml:"-"`
-		XMLName xml.Name `xml:"rss"`
-		Channel Channel  `xml:"channel"`
-	}
-
+func GetFeedsConfigFilePath() string {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	filepath := filepath.Join(userHomeDir, ".config", "rss-tui", "feeds")
+	return filepath
+}
 
+func GetConfigFileLines(filepath string) (lines []string) {
 	file, err := os.Open(filepath)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
 
-	feeds := []Feed{}
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		url, tags := ParseConfigurationLine(scanner.Text())
+		line := scanner.Text()
+		if line == "" {
+			break
+		}
+
+		if trimmedLine := strings.TrimSpace(line[0:1]); trimmedLine == "#" {
+			break
+		}
+
+		lines := append(lines, line)
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	return lines
+}
+
+func DecodeXML() {
+
+}
+
+func FetchFeedsFromURL(feedUrl string) []byte {
+	response, err := http.Get(feedUrl)
+	body, err := io.ReadAll(response.Body)
+	defer response.Body.Close()
+
+	if response.StatusCode > 299 {
+		log.Fatalf("Response failed with status code %d and body %s\n", response.StatusCode, body)
+	}
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return body
+}
+
+type Item struct {
+	Title       string    `xml:"title"`
+	Description string    `xml:"description"`
+	Link        string    `xml:"link"`
+	PubDate     time.Time `xml:"pubDate"`
+}
+
+type Channel struct {
+	Title       string `xml:"title"`
+	Description string `xml:"description"`
+	Link        string `xml:"link"`
+	Items       []Item `xml:"item"`
+}
+
+type Feed struct {
+	Url     string   `xml:"-"`
+	Tags    []string `xml:"-"`
+	XMLName xml.Name `xml:"rss"`
+	Channel Channel  `xml:"channel"`
+}
+
+func main() {
+
+	filepath := GetFeedsConfigFilePath()
+	feedUrls := GetConfigFileLines(filepath)
+	feeds := []Feed{}
+	for _, feed := range feedUrls {
+		url, tags := ParseConfigurationLine(feed)
 		if url != "" {
 			feed := Feed{
 				Url: url,
@@ -87,28 +124,12 @@ func main() {
 		}
 	}
 
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
-
-	response, err := http.Get(feeds[0].Url)
-	body, err := io.ReadAll(response.Body)
-	response.Body.Close()
-
-	if response.StatusCode > 299 {
-		log.Fatalf("Response failed with status code %d and body %s\n", response.StatusCode, body)
-	}
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	rssFeed := Feed{}
 
 	if err := xml.Unmarshal(body, &rssFeed); err != nil {
 		log.Fatal(err)
 	}
-	
+
 	fmt.Println("CHANNEL TITLE : " + rssFeed.Channel.Title)
 	fmt.Println("CHANNEL DESCRIPTION : " + rssFeed.Channel.Description)
 	fmt.Println(rssFeed.Channel.Items)
