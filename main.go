@@ -13,18 +13,6 @@ import (
 	"time"
 )
 
-func ParseConfigurationLine(line string) (url string, tags []string) {
-	stringParts := strings.Split(line, " ")
-	if len(stringParts) > 0 {
-		url = stringParts[0]
-		if len(stringParts) > 1 {
-			tags = stringParts[1:]
-		}
-	}
-
-	return url, tags
-}
-
 func GetFeedsConfigFilePath() string {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
@@ -46,14 +34,14 @@ func GetConfigFileLines(filepath string) (lines []string) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line == "" {
-			break
+			continue
 		}
 
 		if trimmedLine := strings.TrimSpace(line[0:1]); trimmedLine == "#" {
-			break
+			continue
 		}
 
-		lines := append(lines, line)
+		lines = append(lines, line)
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -63,8 +51,15 @@ func GetConfigFileLines(filepath string) (lines []string) {
 	return lines
 }
 
-func DecodeXML() {
-
+func ParseConfigurationLine(line string) (url string, tags []string) {
+	stringParts := strings.Split(line, " ")
+	if len(stringParts) > 0 {
+		url = stringParts[0]
+		if len(stringParts) > 1 {
+			tags = stringParts[1:]
+		}
+	}
+	return url, tags
 }
 
 func FetchFeedsFromURL(feedUrl string) []byte {
@@ -81,6 +76,10 @@ func FetchFeedsFromURL(feedUrl string) []byte {
 	}
 
 	return body
+}
+
+func DecodeXML() {
+
 }
 
 type Item struct {
