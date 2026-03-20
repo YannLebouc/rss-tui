@@ -10,21 +10,22 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
-func GetFeedsConfigFilePath() string {
+func FeedsConfigPath() string {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	filepath := filepath.Join(userHomeDir, ".config", "rss-tui", "feeds")
-	return filepath
+	path := filepath.Join(userHomeDir, ".config", "rss-tui", "feeds")
+	return path
 }
 
-func GetConfigFileLines(filepath string) (lines []string) {
-	file, err := os.Open(filepath)
+func FeedsConfigLines(path string) []string {
+	lines := []string{}
+
+	file, err := os.Open(path)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -37,7 +38,8 @@ func GetConfigFileLines(filepath string) (lines []string) {
 			continue
 		}
 
-		if trimmedLine := strings.TrimSpace(line[0:1]); trimmedLine == "#" {
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "" || strings.HasPrefix(trimmed, "#") {
 			continue
 		}
 
@@ -51,31 +53,54 @@ func GetConfigFileLines(filepath string) (lines []string) {
 	return lines
 }
 
-func ParseConfigurationLine(line string) (url string, tags []string) {
-	stringParts := strings.Split(line, " ")
-	if len(stringParts) > 0 {
-		url = stringParts[0]
-		if len(stringParts) > 1 {
-			tags = stringParts[1:]
+func ParseConfigLines(lines []string) map[string][]string {
+	parsedLines := make(map[string][]string)
+	for _, line := range lines {
+		var url string
+		var tags []string
+		stringParts := strings.Fields(line)
+
+		if len(stringParts) > 0 {
+			url = stringParts[0]
+			if len(stringParts) > 1 {
+				tags = stringParts[1:]
+			}
 		}
+
+		parsedLines[url] = tags
 	}
-	return url, tags
+
+	return parsedLines
 }
 
 func FetchFeedsFromURL(feedUrl string) []byte {
 	response, err := http.Get(feedUrl)
-	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer response.Body.Close()
 
-	if response.StatusCode > 299 {
-		log.Fatalf("Response failed with status code %d and body %s\n", response.StatusCode, body)
-	}
-
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	if response.StatusCode >= 300 {
+		log.Fatalf("Response failed with status code %d and body %s\n", response.StatusCode, body)
+	}
+
 	return body
+}
+
+func InitializeFeeds(parsedConfigLines map[string][]string) (feeds []Feed) {
+	for url, tags := range parsedConfigLines {
+		feed := Feed{
+			Url:  url,
+			Tags: tags,
+		}
+		feeds = append(feeds, feed)
+	}
+	return feeds
 }
 
 func DecodeXML() {
@@ -83,10 +108,10 @@ func DecodeXML() {
 }
 
 type Item struct {
-	Title       string    `xml:"title"`
-	Description string    `xml:"description"`
-	Link        string    `xml:"link"`
-	PubDate     time.Time `xml:"pubDate"`
+	Title       string `xml:"title"`
+	Description string `xml:"description"`
+	Link        string `xml:"link"`
+	PubDate     string `xml:"pubDate"`
 }
 
 type Channel struct {
@@ -104,38 +129,10 @@ type Feed struct {
 }
 
 func main() {
+	configPath := FeedsConfigPath()
+	feedConfigLines := FeedsConfigLines(configPath)
+	parsedConfigLines := ParseConfigLines(feedConfigLines)
+	feedsFromConfig := InitializeFeeds(parsedConfigLines)
 
-	filepath := GetFeedsConfigFilePath()
-	feedUrls := GetConfigFileLines(filepath)
-	feeds := []Feed{}
-	for _, feed := range feedUrls {
-		url, tags := ParseConfigurationLine(feed)
-		if url != "" {
-			feed := Feed{
-				Url: url,
-			}
-
-			if len(tags) > 0 {
-				feed.Tags = tags
-			}
-
-			feeds = append(feeds, feed)
-		}
-	}
-
-	rssFeed := Feed{}
-
-	if err := xml.Unmarshal(body, &rssFeed); err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("CHANNEL TITLE : " + rssFeed.Channel.Title)
-	fmt.Println("CHANNEL DESCRIPTION : " + rssFeed.Channel.Description)
-	fmt.Println(rssFeed.Channel.Items)
-	// for _, feed := range rssFeed.Channel.Items {
-	// 	fmt.Println("feed title : " + feed.Title)
-	// 	fmt.Println("feed link : " + feed.Link)
-	// 	fmt.Println("feed description : " + feed.Description)
-	// 	fmt.Println("feed pubDate : " + feed.PubDate.String())
-	// }
+	fmt.Println(feedsFromConfig)
 }
