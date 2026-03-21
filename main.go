@@ -12,17 +12,48 @@ import (
 	"strings"
 )
 
-func FeedsConfigPath() string {
+type ConfigLine struct {
+	url  string
+	tags []string
+}
+
+type ConfigFile struct {
+	path  string
+	lines []string
+	line  ConfigLine
+}
+
+type Item struct {
+	Title       string `xml:"title"`
+	Description string `xml:"description"`
+	Link        string `xml:"link"`
+	PubDate     string `xml:"pubDate"`
+}
+
+type Channel struct {
+	Title       string `xml:"title"`
+	Description string `xml:"description"`
+	Link        string `xml:"link"`
+	Items       []Item `xml:"item"`
+}
+
+type Feed struct {
+	Url     string   `xml:"-"`
+	Tags    []string `xml:"-"`
+	XMLName xml.Name `xml:"rss"`
+	Channel Channel  `xml:"channel"`
+}
+
+func (c *ConfigFile) Path() {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	path := filepath.Join(userHomeDir, ".config", "rss-tui", "feeds")
-	return path
+	c.path = filepath.Join(userHomeDir, ".config", "rss-tui", "feeds")
 }
 
-func FeedsConfigLines(path string) []string {
+func (c *ConfigFile) Lines(path string) {
 	lines := []string{}
 
 	file, err := os.Open(path)
@@ -50,11 +81,10 @@ func FeedsConfigLines(path string) []string {
 		log.Fatal(err)
 	}
 
-	return lines
+	c.lines = lines
 }
 
-func ParseConfigLines(lines []string) map[string][]string {
-	parsedLines := make(map[string][]string)
+func (c *ConfigFile) Parse(lines []string) {
 	for _, line := range lines {
 		var url string
 		var tags []string
@@ -66,11 +96,9 @@ func ParseConfigLines(lines []string) map[string][]string {
 				tags = stringParts[1:]
 			}
 		}
-
-		parsedLines[url] = tags
+		c.line.url = url
+		c.line.tags = tags
 	}
-
-	return parsedLines
 }
 
 func FetchFeedsFromURL(feedUrl string) []byte {
@@ -107,32 +135,12 @@ func DecodeXML() {
 
 }
 
-type Item struct {
-	Title       string `xml:"title"`
-	Description string `xml:"description"`
-	Link        string `xml:"link"`
-	PubDate     string `xml:"pubDate"`
-}
-
-type Channel struct {
-	Title       string `xml:"title"`
-	Description string `xml:"description"`
-	Link        string `xml:"link"`
-	Items       []Item `xml:"item"`
-}
-
-type Feed struct {
-	Url     string   `xml:"-"`
-	Tags    []string `xml:"-"`
-	XMLName xml.Name `xml:"rss"`
-	Channel Channel  `xml:"channel"`
-}
-
 func main() {
-	configPath := FeedsConfigPath()
-	feedConfigLines := FeedsConfigLines(configPath)
-	parsedConfigLines := ParseConfigLines(feedConfigLines)
-	feedsFromConfig := InitializeFeeds(parsedConfigLines)
+	configFile := ConfigFile{}
+	configFile.Path()
+	configFile.Lines(configFile.path)
+	configFile.Parse(configFile.lines)
+	feedsFromConfig := InitializeFeeds(configFile.Lines())
 
 	fmt.Println(feedsFromConfig)
 }
