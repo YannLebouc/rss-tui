@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"encoding/xml"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -13,14 +12,13 @@ import (
 )
 
 type ConfigLine struct {
-	url  string
-	tags []string
+	URL  string
+	Tags []string
 }
 
 type ConfigFile struct {
-	path  string
-	lines []string
-	line  ConfigLine
+	Path  string
+	Lines []ConfigLine
 }
 
 type Item struct {
@@ -44,16 +42,16 @@ type Feed struct {
 	Channel Channel  `xml:"channel"`
 }
 
-func (c *ConfigFile) Path() {
+func ConfigPath() string {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	c.path = filepath.Join(userHomeDir, ".config", "rss-tui", "feeds")
+	return filepath.Join(userHomeDir, ".config", "rss-tui", "feeds")
 }
 
-func (c *ConfigFile) Lines(path string) {
+func ReadConfig(path string) []string {
 	lines := []string{}
 
 	file, err := os.Open(path)
@@ -80,25 +78,36 @@ func (c *ConfigFile) Lines(path string) {
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
-
-	c.lines = lines
+	return lines
 }
 
-func (c *ConfigFile) Parse(lines []string) {
+func ParseConfig(lines []string) []ConfigLine {
+	parsedLines := []ConfigLine{}
+
 	for _, line := range lines {
 		var url string
 		var tags []string
 		stringParts := strings.Fields(line)
-
 		if len(stringParts) > 0 {
 			url = stringParts[0]
 			if len(stringParts) > 1 {
 				tags = stringParts[1:]
 			}
 		}
-		c.line.url = url
-		c.line.tags = tags
+
+		parsedLine := ConfigLine{
+			URL:  url,
+			Tags: tags,
+		}
+		parsedLines = append(parsedLines, parsedLine)
 	}
+
+	return parsedLines
+}
+
+func (c *ConfigFile) Load() {
+	rawLines := ReadConfig(c.Path)
+	c.Lines = ParseConfig(rawLines)
 }
 
 func FetchFeedsFromURL(feedUrl string) []byte {
@@ -136,11 +145,7 @@ func DecodeXML() {
 }
 
 func main() {
-	configFile := ConfigFile{}
-	configFile.Path()
-	configFile.Lines(configFile.path)
-	configFile.Parse(configFile.lines)
-	feedsFromConfig := InitializeFeeds(configFile.Lines())
-
-	fmt.Println(feedsFromConfig)
+	configFile := ConfigFile{
+		Path: ConfigPath(),
+	}
 }
