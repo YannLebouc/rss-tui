@@ -110,11 +110,28 @@ func (c *ConfigFile) Load() {
 	c.Lines = ParseConfig(rawLines)
 }
 
-func FetchFeedsFromURL(feedUrl string) []byte {
-	response, err := http.Get(feedUrl)
+func InitializeFeeds(config *ConfigFile) (feeds []Feed) {
+	for _, line := range config.Lines {
+		feed := Feed{
+			Url:  line.URL,
+			Tags: line.Tags,
+		}
+		feeds = append(feeds, feed)
+	}
+	return feeds
+}
+
+func (f *Feed) Load() {
+	body := FetchFeedFromUrl(f.Url)
+
+}
+
+func FetchFeedFromUrl(url string) []byte {
+	response, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	defer response.Body.Close()
 
 	body, err := io.ReadAll(response.Body)
@@ -129,17 +146,6 @@ func FetchFeedsFromURL(feedUrl string) []byte {
 	return body
 }
 
-func InitializeFeeds(parsedConfigLines map[string][]string) (feeds []Feed) {
-	for url, tags := range parsedConfigLines {
-		feed := Feed{
-			Url:  url,
-			Tags: tags,
-		}
-		feeds = append(feeds, feed)
-	}
-	return feeds
-}
-
 func DecodeXML() {
 
 }
@@ -148,4 +154,7 @@ func main() {
 	configFile := ConfigFile{
 		Path: ConfigPath(),
 	}
+	configFile.Load()
+
+	feeds := InitializeFeeds()
 }
