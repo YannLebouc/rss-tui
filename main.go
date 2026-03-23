@@ -36,7 +36,7 @@ type Channel struct {
 }
 
 type Feed struct {
-	Url     string   `xml:"-"`
+	URL     string   `xml:"-"`
 	Tags    []string `xml:"-"`
 	XMLName xml.Name `xml:"rss"`
 	Channel Channel  `xml:"channel"`
@@ -110,10 +110,11 @@ func (c *ConfigFile) Load() {
 	c.Lines = ParseConfig(rawLines)
 }
 
-func InitializeFeeds(config *ConfigFile) (feeds []Feed) {
+func InitializeFeeds(config *ConfigFile) []Feed {
+	feeds := []Feed{}
 	for _, line := range config.Lines {
 		feed := Feed{
-			Url:  line.URL,
+			URL:  line.URL,
 			Tags: line.Tags,
 		}
 		feeds = append(feeds, feed)
@@ -121,12 +122,7 @@ func InitializeFeeds(config *ConfigFile) (feeds []Feed) {
 	return feeds
 }
 
-func (f *Feed) Load() {
-	body := FetchFeedFromUrl(f.Url)
-
-}
-
-func FetchFeedFromUrl(url string) []byte {
+func FetchRawFeed(url string) []byte {
 	response, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
@@ -156,5 +152,9 @@ func main() {
 	}
 	configFile.Load()
 
-	feeds := InitializeFeeds()
+	feeds := InitializeFeeds(&configFile)
+	for _, feed := range feeds {
+		feedXML := FetchRawFeed(feed.URL)
+		DecodeXML()
+	}
 }
