@@ -1,11 +1,8 @@
-package main
+package config
 
 import (
 	"bufio"
-	"encoding/xml"
-	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -21,35 +18,9 @@ type ConfigFile struct {
 	Lines []ConfigLine
 }
 
-type Item struct {
-	Title       string `xml:"title"`
-	Description string `xml:"description"`
-	Link        string `xml:"link"`
-	PubDate     string `xml:"pubDate"`
-}
-
-type Channel struct {
-	Title       string `xml:"title"`
-	Description string `xml:"description"`
-	Link        string `xml:"link"`
-	Items       []Item `xml:"item"`
-}
-
 type FeedConfig struct {
 	URL  string
 	Tags []string
-}
-
-type Feed struct {
-	URL     string   `xml:"-"`
-	Tags    []string `xml:"-"`
-	XMLName xml.Name `xml:"rss"`
-	Channel Channel  `xml:"channel"`
-}
-
-type FetchedFeed struct {
-	Config FeedConfig
-	Feed   Feed
 }
 
 func ConfigPath() string {
@@ -120,42 +91,14 @@ func (c *ConfigFile) Load() {
 	c.Lines = ParseConfig(rawLines)
 }
 
-func InitializeFeeds(config *ConfigFile) []Feed {
-	feeds := []Feed{}
+func InitializeFeedsConfig(config *ConfigFile) []FeedConfig {
+	feeds := []FeedConfig{}
 	for _, line := range config.Lines {
-		feed := Feed{
+		feed := FeedConfig{
 			URL:  line.URL,
 			Tags: line.Tags,
 		}
 		feeds = append(feeds, feed)
 	}
 	return feeds
-}
-
-func main() {
-	configFile := ConfigFile{
-		Path: ConfigPath(),
-	}
-	configFile.Load()
-
-	feeds := InitializeFeeds(&configFile)
-
-	for i := range feeds {
-		response, err := http.Get(feeds[i].URL)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer response.Body.Close()
-
-		if response.StatusCode >= 300 {
-			log.Fatalf("Response failed with status code %d and body %s\n", response.StatusCode)
-		}
-
-		decoder := xml.NewDecoder(response.Body)
-		if err := decoder.Decode(&feeds[i]); err != nil {
-			log.Fatalf("Failed to decode feed from URL %s: %v\n", feeds[i].URL, err)
-		}
-	}
-
-	fmt.Println(feeds[0].Channel)
 }
