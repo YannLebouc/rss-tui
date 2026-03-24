@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/xml"
-	"io"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -35,11 +35,21 @@ type Channel struct {
 	Items       []Item `xml:"item"`
 }
 
+type FeedConfig struct {
+	URL  string
+	Tags []string
+}
+
 type Feed struct {
 	URL     string   `xml:"-"`
 	Tags    []string `xml:"-"`
 	XMLName xml.Name `xml:"rss"`
 	Channel Channel  `xml:"channel"`
+}
+
+type FetchedFeed struct {
+	Config FeedConfig
+	Feed   Feed
 }
 
 func ConfigPath() string {
@@ -122,30 +132,6 @@ func InitializeFeeds(config *ConfigFile) []Feed {
 	return feeds
 }
 
-func FetchRawFeed(url string) []byte {
-	response, err := http.Get(url)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer response.Body.Close()
-
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if response.StatusCode >= 300 {
-		log.Fatalf("Response failed with status code %d and body %s\n", response.StatusCode, body)
-	}
-
-	return body
-}
-
-func DecodeXML() {
-
-}
-
 func main() {
 	configFile := ConfigFile{
 		Path: ConfigPath(),
@@ -153,8 +139,23 @@ func main() {
 	configFile.Load()
 
 	feeds := InitializeFeeds(&configFile)
-	for _, feed := range feeds {
-		feedXML := FetchRawFeed(feed.URL)
-		DecodeXML()
+
+	for i := range feeds {
+		response, err := http.Get(feeds[i].URL)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer response.Body.Close()
+
+		if response.StatusCode >= 300 {
+			log.Fatalf("Response failed with status code %d and body %s\n", response.StatusCode)
+		}
+
+		decoder := xml.NewDecoder(response.Body)
+		if err := decoder.Decode(&feeds[i]); err != nil {
+			log.Fatalf("Failed to decode feed from URL %s: %v\n", feeds[i].URL, err)
+		}
 	}
+
+	fmt.Println(feeds[0].Channel)
 }
