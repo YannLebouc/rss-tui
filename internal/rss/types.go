@@ -1,6 +1,10 @@
 package rss
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+
+	"github.com/YannLebouc/rss-tui/internal/config"
+)
 
 type Item struct {
 	Title       string `xml:"title"`
@@ -24,6 +28,6 @@ type Feed struct {
 }
 
 type FetchedFeed struct {
-	Config FeedConfig
+	Config config.FeedConfig
 	Feed   Feed
 }

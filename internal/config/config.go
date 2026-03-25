@@ -2,103 +2,58 @@ package config
 
 import (
 	"bufio"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
 )
-
-type ConfigLine struct {
-	URL  string
-	Tags []string
-}
-
-type ConfigFile struct {
-	Path  string
-	Lines []ConfigLine
-}
 
 type FeedConfig struct {
 	URL  string
 	Tags []string
 }
 
-func ConfigPath() string {
+func Path() (string, error) {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 
-	return filepath.Join(userHomeDir, ".config", "rss-tui", "feeds")
+	return filepath.Join(userHomeDir, ".config", "rss-tui", "feeds"), nil
 }
 
-func ReadConfig(path string) []string {
-	lines := []string{}
-
+func Load(path string) ([]FeedConfig, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer file.Close()
 
+	var feeds []FeedConfig
+
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		line := scanner.Text()
-		if line == "" {
+		line := strings.TrimSpace(scanner.Text())
+
+		if line == "" || strings.HasPrefix(line, "#") {
 			continue
 		}
 
-		trimmed := strings.TrimSpace(line)
-		if trimmed == "" || strings.HasPrefix(trimmed, "#") {
+		lineParts := strings.Fields(line)
+		if len(lineParts) == 0 {
 			continue
 		}
 
-		lines = append(lines, line)
+		feed := FeedConfig{
+			URL:  lineParts[0],
+			Tags: lineParts[1:],
+		}
+
+		feeds = append(feeds, feed)
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
-	return lines
-}
-
-func ParseConfig(lines []string) []ConfigLine {
-	parsedLines := []ConfigLine{}
-
-	for _, line := range lines {
-		var url string
-		var tags []string
-		stringParts := strings.Fields(line)
-		if len(stringParts) > 0 {
-			url = stringParts[0]
-			if len(stringParts) > 1 {
-				tags = stringParts[1:]
-			}
-		}
-
-		parsedLine := ConfigLine{
-			URL:  url,
-			Tags: tags,
-		}
-		parsedLines = append(parsedLines, parsedLine)
+		return nil, err
 	}
 
-	return parsedLines
-}
-
-func (c *ConfigFile) Load() {
-	rawLines := ReadConfig(c.Path)
-	c.Lines = ParseConfig(rawLines)
-}
-
-func InitializeFeedsConfig(config *ConfigFile) []FeedConfig {
-	feeds := []FeedConfig{}
-	for _, line := range config.Lines {
-		feed := FeedConfig{
-			URL:  line.URL,
-			Tags: line.Tags,
-		}
-		feeds = append(feeds, feed)
-	}
-	return feeds
+	return feeds, nil
 }

@@ -5,15 +5,19 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"github.com/YannLebouc/rss-tui/internal/config"
 )
 
 func main() {
-	configFile := ConfigFile{
-		Path: ConfigPath(),
+	configPath, err := config.Path()
+	if err != nil {
+		log.Fatal(err)
 	}
-	configFile.Load()
 
-	feeds := InitializeFeeds(&configFile)
+	feeds, err := config.Load(configPath)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	for i := range feeds {
 		response, err := http.Get(feeds[i].URL)
