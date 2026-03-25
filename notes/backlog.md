@@ -68,12 +68,11 @@ Goal: extract items from feed content.
 
 ### RSS parsing
 
-- [ ] Parse RSS XML
-- [ ] Extract feed title
-- [ ] Extract item title
-- [ ] Extract item link
-- [ ] Extract item publication date
-- [ ] Extract item GUID if available
+- [x] Parse RSS XML
+- [x] Extract feed title
+- [x] Extract item title
+- [x] Extract item link
+- [x] Extract item publication date
 
 ### Atom parsing
 
