@@ -2,28 +2,16 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"os"
 
-	"github.com/YannLebouc/rss-tui/internal/config"
-	"github.com/YannLebouc/rss-tui/internal/fetch"
+	tea "charm.land/bubbletea/v2"
+	"github.com/YannLebouc/rss-tui/internal/ui"
 )
 
 func main() {
-	configPath, err := config.Path()
-	if err != nil {
-		log.Fatal(err)
+	p := tea.NewProgram(ui.InitialModel())
+	if _, err := p.Run(); err != nil {
+		fmt.Printf("Alas, there's been an error: %v", err)
+		os.Exit(1)
 	}
-
-	feeds, err := config.Load(configPath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fetcher := fetch.NewFetcher()
-	feed, err := fetcher.Fetch(feeds[0].URL)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println(feed.Channel.Items[0])
 }

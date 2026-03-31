@@ -12,7 +12,7 @@ type Model struct {
 	error   error
 }
 
-func initialModel() Model {
+func InitialModel() Model {
 	return Model{
 		loading: true,
 	}
