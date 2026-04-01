@@ -8,25 +8,29 @@ import (
 
 func (m Model) View() tea.View {
 	// The header
-	s := "What should we buy at the market?\n\n"
+	if m.loading {
+		s := "Loading..."
+		return tea.NewView(s)
+	}
+
+	if m.error != nil {
+		s := m.error.Error()
+		return tea.NewView(s)
+	}
+
+	s := "Select the article you wish to read\n\n"
 
 	// Iterate over our choices
-	for i, choice := range m.choices {
-
+	s += fmt.Sprintf("Articles from %s :\n", m.feeds[0].Channel.Title)
+	for i, item := range m.feeds[0].Channel.Items {
 		// Is the cursor pointing at this choice?
 		cursor := " " // no cursor
 		if m.cursor == i {
 			cursor = ">" // cursor!
 		}
 
-		// Is this choice selected?
-		checked := " " // not selected
-		if _, ok := m.selected[i]; ok {
-			checked = "x" // selected!
-		}
-
 		// Render the row
-		s += fmt.Sprintf("%s [%s] %s\n", cursor, checked, choice)
+		s += fmt.Sprintf("%s %s\n", cursor, item.Title)
 	}
 
 	// The footer

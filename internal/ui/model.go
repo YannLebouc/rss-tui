@@ -19,5 +19,5 @@ func InitialModel() Model {
 }
 
 func (m Model) Init() tea.Cmd {
-	return nil
+	return LoadFeeds
 }

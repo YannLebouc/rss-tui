@@ -25,22 +25,19 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// The "down" and "j" keys move the cursor down
 		case "down", "j":
-			if m.cursor < len(m.choices)-1 {
+			if m.cursor < len(m.feeds)-1 {
 				m.cursor++
 			}
-
-		// The "enter" key and the space bar toggle the selected state
-		// for the item that the cursor is pointing at.
-		case "enter", "space":
-			_, ok := m.selected[m.cursor]
-			if ok {
-				delete(m.selected, m.cursor)
-			} else {
-				m.selected[m.cursor] = struct{}{}
-			}
 		}
-	}
 
+	case FeedsLoadedMsg:
+		m.feeds = msg.Feeds
+		m.loading = false
+
+	case ErrMsg:
+		m.error = msg.err
+		m.loading = false
+	}
 	// Return the updated model to the Bubble Tea runtime for processing.
 	// Note that we're not returning a command.
 	return m, nil

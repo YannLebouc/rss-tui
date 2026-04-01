@@ -30,6 +30,6 @@ func LoadFeeds() tea.Msg {
 	}
 
 	return FeedsLoadedMsg{
-		feeds,
+		Feeds: feeds,
 	}
 }

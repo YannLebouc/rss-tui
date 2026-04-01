@@ -11,5 +11,5 @@ func (e ErrMsg) Error() string {
 }
 
 type FeedsLoadedMsg struct {
-	feeds []rss.Feed
+	Feeds []rss.Feed
 }
