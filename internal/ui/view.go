@@ -6,8 +6,32 @@ import (
 	tea "charm.land/bubbletea/v2"
 )
 
+func renderFeeds(model Model) tea.View {
+	s := "Select a feed by pressing enter to get it's articles :\n\n"
+
+	for i, feed := range model.feeds {
+		cursor := " " // no cursor
+		if model.cursor == i {
+			cursor = ">" // cursor!
+		}
+		s += fmt.Sprintf("%s %s\n", cursor, feed.Channel.Title)
+	}
+
+	s += "\nPress q to quit.\n"
+
+	return tea.NewView(s)
+}
+
+func renderArticles(model Model) tea.View {
+	return tea.NewView("")
+}
+
+func renderArticleDetail(model Model) tea.View {
+	return tea.NewView("")
+}
+
 func (m Model) View() tea.View {
-	// The header
+
 	if m.loading {
 		s := "Loading..."
 		return tea.NewView(s)
@@ -18,24 +42,14 @@ func (m Model) View() tea.View {
 		return tea.NewView(s)
 	}
 
-	s := "Select the article you wish to read\n\n"
-
-	// Iterate over our choices
-	s += fmt.Sprintf("Articles from %s :\n", m.feeds[0].Channel.Title)
-	for i, item := range m.feeds[0].Channel.Items {
-		// Is the cursor pointing at this choice?
-		cursor := " " // no cursor
-		if m.cursor == i {
-			cursor = ">" // cursor!
-		}
-
-		// Render the row
-		s += fmt.Sprintf("%s %s\n", cursor, item.Title)
+	switch m.mode {
+	case FEEDS_LIST:
+		return renderFeeds(m)
+	case ARTICLES_LIST:
+		return renderArticles(m)
+	case ARTICLE_DETAIL:
+		return renderArticleDetail(m)
 	}
 
-	// The footer
-	s += "\nPress q to quit.\n"
-
-	// Send the UI for rendering
-	return tea.NewView(s)
+	return tea.NewView("RSS-TUI")
 }

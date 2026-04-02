@@ -28,10 +28,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.cursor < len(m.feeds[0].Channel.Items)-1 {
 				m.cursor++
 			}
+		// refreshing feeds
+		case "r":
+			m.loading = true
+			return m, LoadFeeds
 		}
 
 	case FeedsLoadedMsg:
 		m.feeds = msg.Feeds
+		m.cursor = 0
 		m.loading = false
 
 	case ErrMsg:
