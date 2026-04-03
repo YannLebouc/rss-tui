@@ -26,6 +26,7 @@ type Model struct {
 func InitialModel() Model {
 	return Model{
 		loading: true,
+		mode:    FEEDS_LIST,
 	}
 }
 
