@@ -1,0 +1,51 @@
+package feeds
+
+import "encoding/xml"
+
+type RssItem struct {
+	Title       string `xml:"title"`
+	Description string `xml:"description"`
+	Link        string `xml:"link"`
+	PubDate     string `xml:"pubDate"`
+}
+
+type Channel struct {
+	Title   string    `xml:"title"`
+	Link    string    `xml:"link"`
+	PubDate string    `xml:"pubDate"`
+	Items   []RssItem `xml:"item"`
+}
+
+type RssFeed struct {
+	XMLName xml.Name `xml:"rss"`
+	Channel Channel  `xml:"channel"`
+}
+
+type Entry struct {
+	Title   string `xml:"title"`
+	Content string `xml:"content"`
+	Link    string `xml:"link"` // Check the atom doc to see the right format to decode correctly
+	Updated string `xml:"updated"`
+}
+
+type AtomFeed struct {
+	XMLName xml.Name `xml:"feed"`
+	Title   string   `xml:"title"`
+	Link    string   `xml:"link"` // Check the atom doc to see the right format to decode correctly
+	Updated string   `xml:"updated"`
+	Entries []Entry  `xml:"entry"`
+}
+
+type Item struct {
+	Title   string
+	Content string
+	Link    string
+	Date    string
+}
+
+type Feed struct {
+	Title string
+	Link  string
+	Date  string
+	Items []Item
+}
