@@ -21,19 +21,24 @@ type RssFeed struct {
 	Channel Channel  `xml:"channel"`
 }
 
+type AtomLink struct {
+	Rel  string `xml:"rel,attr"`
+	Href string `xml:"href,attr"`
+}
+
 type Entry struct {
-	Title   string `xml:"title"`
-	Content string `xml:"content"`
-	Link    string `xml:"link"` // Check the atom doc to see the right format to decode correctly
-	Updated string `xml:"updated"`
+	Title   string     `xml:"title"`
+	Content string     `xml:"content"`
+	Links   []AtomLink `xml:"link"`
+	Updated string     `xml:"updated"`
 }
 
 type AtomFeed struct {
-	XMLName xml.Name `xml:"feed"`
-	Title   string   `xml:"title"`
-	Link    string   `xml:"link"` // Check the atom doc to see the right format to decode correctly
-	Updated string   `xml:"updated"`
-	Entries []Entry  `xml:"entry"`
+	XMLName xml.Name   `xml:"feed"`
+	Title   string     `xml:"title"`
+	Links   []AtomLink `xml:"link"`
+	Updated string     `xml:"updated"`
+	Entries []Entry    `xml:"entry"`
 }
 
 type Item struct {
@@ -48,4 +53,8 @@ type Feed struct {
 	Link  string
 	Date  string
 	Items []Item
+}
+
+type Root struct {
+	XMLName xml.Name
 }
