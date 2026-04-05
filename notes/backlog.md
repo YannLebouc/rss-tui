@@ -58,7 +58,7 @@ Goal: download RSS feeds from URLs.
 ### Feed refresh
 
 - [ ] Refresh one feed
-- [ ] Refresh all feeds from config
+- [x] Refresh all feeds from config
 
 ---
 
@@ -76,10 +76,10 @@ Goal: extract items from feed content.
 
 ### Atom parsing
 
-- [ ] Detect Atom feeds
-- [ ] Extract Atom entry title
-- [ ] Extract entry link
-- [ ] Extract entry date
+- [x] Detect Atom feeds
+- [x] Extract Atom entry title
+- [x] Extract entry link
+- [x] Extract entry date
 
 ---
 
