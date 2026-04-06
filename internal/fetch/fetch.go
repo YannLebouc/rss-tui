@@ -30,7 +30,7 @@ func (f *Fetcher) Fetch(url string) (feeds.Feed, error) {
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		return feeds.Feed{}, fmt.Errorf("HTTP reponse code expected : 200, got %d while trying to fetch %s", response.StatusCode, url)
+		return feeds.Feed{}, fmt.Errorf("unexpected status code %d for %s", response.StatusCode, url)
 	}
 
 	root := feeds.Root{}

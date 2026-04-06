@@ -19,17 +19,17 @@ func LoadFeeds() tea.Msg {
 		return ErrMsg{err}
 	}
 
-	feeds := []feeds.Feed{}
+	var result = []feeds.Feed{}
 	fetcher := fetch.NewFetcher()
 	for _, line := range configLines {
 		feed, err := fetcher.Fetch(line.URL)
 		if err != nil {
 			return ErrMsg{err}
 		}
-		feeds = append(feeds, feed)
+		result = append(result, feed)
 	}
 
 	return FeedsLoadedMsg{
-		Feeds: feeds,
+		Feeds: result,
 	}
 }
