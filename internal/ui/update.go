@@ -29,7 +29,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 			if m.mode == ARTICLES_LIST {
-				if m.cursor < len(m.feeds[m.selectedFeed].Channel.Items)-1 {
+				if m.cursor < len(m.feeds[m.selectedFeed].Items)-1 {
 					m.cursor++
 				}
 			}

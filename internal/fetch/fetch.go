@@ -27,7 +27,6 @@ func (f *Fetcher) Fetch(url string) (feeds.Feed, error) {
 	if err != nil {
 		return feeds.Feed{}, err
 	}
-
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
@@ -36,8 +35,13 @@ func (f *Fetcher) Fetch(url string) (feeds.Feed, error) {
 
 	root := feeds.Root{}
 	feed := feeds.Feed{}
+
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
+		return feeds.Feed{}, err
+	}
+
+	if err := xml.Unmarshal(body, &root); err != nil {
 		return feeds.Feed{}, err
 	}
 
@@ -48,6 +52,7 @@ func (f *Fetcher) Fetch(url string) (feeds.Feed, error) {
 			return feeds.Feed{}, err
 		}
 
+		fmt.Println(rssFeed.Channel.Title)
 		feed.Title = rssFeed.Channel.Title
 		feed.Link = rssFeed.Channel.Link
 		feed.Date = rssFeed.Channel.PubDate

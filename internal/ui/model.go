@@ -2,7 +2,7 @@ package ui
 
 import (
 	tea "charm.land/bubbletea/v2"
-	"github.com/YannLebouc/rss-tui/internal/rss"
+	"github.com/YannLebouc/rss-tui/internal/feeds"
 )
 
 type Mode int
@@ -14,7 +14,7 @@ const (
 )
 
 type Model struct {
-	feeds           []rss.Feed
+	feeds           []feeds.Feed
 	mode            Mode
 	selectedFeed    int
 	selectedArticle int

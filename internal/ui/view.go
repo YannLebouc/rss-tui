@@ -14,7 +14,7 @@ func renderFeeds(model Model) tea.View {
 		if model.cursor == i {
 			cursor = ">" // cursor!
 		}
-		s += fmt.Sprintf("%s %s\n", cursor, feed.Channel.Title)
+		s += fmt.Sprintf("%s %s\n", cursor, feed.Title)
 	}
 
 	s += "\nPress q to quit.\n"
@@ -25,7 +25,7 @@ func renderFeeds(model Model) tea.View {
 func renderArticles(model Model) tea.View {
 	s := "Press ENTER to open the article, press ESC to go back to feeds list\n\n"
 
-	articles := model.feeds[model.selectedFeed].Channel.Items
+	articles := model.feeds[model.selectedFeed].Items
 
 	for i, article := range articles {
 		cursor := " " // no cursor
@@ -41,11 +41,11 @@ func renderArticles(model Model) tea.View {
 }
 
 func renderArticleDetail(model Model) tea.View {
-	article := model.feeds[model.selectedFeed].Channel.Items[model.selectedArticle]
+	article := model.feeds[model.selectedFeed].Items[model.selectedArticle]
 
 	s := "Press ESC to go back to articles list\n\n"
 	s += fmt.Sprintf("%s\n\n", article.Title)
-	s += fmt.Sprintf("%s\n\n", article.Description)
+	s += fmt.Sprintf("%s\n\n", article.Content)
 	s += "\nPress q to quit.\n"
 
 	return tea.NewView(s)

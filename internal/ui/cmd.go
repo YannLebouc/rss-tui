@@ -3,8 +3,8 @@ package ui
 import (
 	tea "charm.land/bubbletea/v2"
 	"github.com/YannLebouc/rss-tui/internal/config"
+	"github.com/YannLebouc/rss-tui/internal/feeds"
 	"github.com/YannLebouc/rss-tui/internal/fetch"
-	"github.com/YannLebouc/rss-tui/internal/rss"
 )
 
 func LoadFeeds() tea.Msg {
@@ -19,7 +19,7 @@ func LoadFeeds() tea.Msg {
 		return ErrMsg{err}
 	}
 
-	feeds := []rss.Feed{}
+	feeds := []feeds.Feed{}
 	fetcher := fetch.NewFetcher()
 	for _, line := range configLines {
 		feed, err := fetcher.Fetch(line.URL)

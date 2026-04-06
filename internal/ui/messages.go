@@ -1,6 +1,6 @@
 package ui
 
-import "github.com/YannLebouc/rss-tui/internal/rss"
+import "github.com/YannLebouc/rss-tui/internal/feeds"
 
 type ErrMsg struct {
 	err error
@@ -11,5 +11,5 @@ func (e ErrMsg) Error() string {
 }
 
 type FeedsLoadedMsg struct {
-	Feeds []rss.Feed
+	Feeds []feeds.Feed
 }
