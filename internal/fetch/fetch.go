@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/YannLebouc/rss-tui/internal/feeds"
 )
@@ -14,7 +15,9 @@ type Fetcher struct {
 
 func NewFetcher() *Fetcher {
 	return &Fetcher{
-		httpClient: &http.Client{},
+		httpClient: &http.Client{
+			Timeout: 10 * time.Second,
+		},
 	}
 }
 
