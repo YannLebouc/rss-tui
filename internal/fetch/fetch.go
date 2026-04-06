@@ -52,7 +52,6 @@ func (f *Fetcher) Fetch(url string) (feeds.Feed, error) {
 			return feeds.Feed{}, err
 		}
 
-		fmt.Println(rssFeed.Channel.Title)
 		feed.Title = rssFeed.Channel.Title
 		feed.Link = rssFeed.Channel.Link
 		feed.Date = rssFeed.Channel.PubDate

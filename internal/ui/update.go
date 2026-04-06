@@ -41,23 +41,24 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// Selecting a feed or an article
 		case "enter":
-			if m.mode == FEEDS_LIST {
+			switch m.mode {
+			case FEEDS_LIST:
 				m.selectedFeed = m.cursor
 				m.cursor = 0
 				m.mode = ARTICLES_LIST
-			}
-			if m.mode == ARTICLES_LIST {
+			case ARTICLES_LIST:
 				m.selectedArticle = m.cursor
 				m.mode = ARTICLE_DETAIL
 			}
 
+		// Going back to previous view
 		case "esc":
-			if m.mode == ARTICLES_LIST {
+			switch m.mode {
+			case ARTICLES_LIST:
 				m.mode = FEEDS_LIST
 				m.cursor = 0
 				m.selectedFeed = m.cursor
-			}
-			if m.mode == ARTICLE_DETAIL {
+			case ARTICLE_DETAIL:
 				m.mode = ARTICLES_LIST
 				m.cursor = 0
 				m.selectedArticle = m.cursor
@@ -65,9 +66,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case FeedsLoadedMsg:
-		m = Model{}
 		m.feeds = msg.Feeds
 		m.mode = FEEDS_LIST
+		m.loading = false
+		m.error = nil
+		m.cursor = 0
+		m.selectedArticle = m.cursor
+		m.selectedFeed = m.cursor
 
 	case ErrMsg:
 		m.error = msg.err
