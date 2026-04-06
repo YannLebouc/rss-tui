@@ -50,12 +50,24 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.selectedArticle = m.cursor
 				m.mode = ARTICLE_DETAIL
 			}
+
+		case "esc":
+			if m.mode == ARTICLES_LIST {
+				m.mode = FEEDS_LIST
+				m.cursor = 0
+				m.selectedFeed = m.cursor
+			}
+			if m.mode == ARTICLE_DETAIL {
+				m.mode = ARTICLES_LIST
+				m.cursor = 0
+				m.selectedArticle = m.cursor
+			}
 		}
 
 	case FeedsLoadedMsg:
+		m = Model{}
 		m.feeds = msg.Feeds
-		m.cursor = 0
-		m.loading = false
+		m.mode = FEEDS_LIST
 
 	case ErrMsg:
 		m.error = msg.err
