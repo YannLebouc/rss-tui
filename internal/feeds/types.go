@@ -29,6 +29,7 @@ type AtomLink struct {
 type Entry struct {
 	Title   string     `xml:"title"`
 	Content string     `xml:"content"`
+	Summary string     `xml:"summary"`
 	Links   []AtomLink `xml:"link"`
 	Updated string     `xml:"updated"`
 }

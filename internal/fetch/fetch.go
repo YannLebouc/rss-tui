@@ -78,10 +78,17 @@ func (f *Fetcher) Fetch(url string) (feeds.Feed, error) {
 			item := feeds.Item{}
 
 			item.Title = entry.Title
+
+			if entry.Content != "" {
+				item.Content = entry.Content
+			} else {
+				item.Content = entry.Summary
+			}
+
 			item.Content = entry.Content
 			item.Date = entry.Updated
 			for _, link := range entry.Links {
-				if link.Rel == "self" {
+				if link.Rel == "related" {
 					item.Link = link.Href
 					break
 				}
