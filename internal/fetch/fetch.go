@@ -3,6 +3,7 @@ package fetch
 import (
 	"encoding/xml"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -29,21 +30,21 @@ func (f *Fetcher) Fetch(url string) (feeds.Feed, error) {
 
 	defer response.Body.Close()
 
-	if !(response.StatusCode == 200) {
+	if response.StatusCode != http.StatusOK {
 		return feeds.Feed{}, fmt.Errorf("HTTP reponse code expected : 200, got %d while trying to fetch %s", response.StatusCode, url)
 	}
 
 	root := feeds.Root{}
 	feed := feeds.Feed{}
-	decoder := xml.NewDecoder(response.Body)
-	if err := decoder.Decode(&root); err != nil {
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
 		return feeds.Feed{}, err
 	}
 
 	switch root.XMLName.Local {
 	case "rss":
 		rssFeed := feeds.RssFeed{}
-		if err := decoder.Decode(&rssFeed); err != nil {
+		if err := xml.Unmarshal(body, &rssFeed); err != nil {
 			return feeds.Feed{}, err
 		}
 
@@ -64,7 +65,7 @@ func (f *Fetcher) Fetch(url string) (feeds.Feed, error) {
 
 	case "feed":
 		atomFeed := feeds.AtomFeed{}
-		if err := decoder.Decode(&atomFeed); err != nil {
+		if err := xml.Unmarshal(body, &atomFeed); err != nil {
 			return feeds.Feed{}, err
 		}
 
