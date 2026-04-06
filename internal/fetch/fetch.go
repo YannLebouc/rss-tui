@@ -76,7 +76,7 @@ func (f *Fetcher) Fetch(url string) (feeds.Feed, error) {
 		feed.Title = atomFeed.Title
 		feed.Date = atomFeed.Updated
 		for _, link := range atomFeed.Links {
-			if link.Rel == "self" {
+			if link.Rel == "alternate" {
 				feed.Link = link.Href
 				break
 			}
@@ -93,10 +93,9 @@ func (f *Fetcher) Fetch(url string) (feeds.Feed, error) {
 				item.Content = entry.Summary
 			}
 
-			item.Content = entry.Content
 			item.Date = entry.Updated
 			for _, link := range entry.Links {
-				if link.Rel == "related" {
+				if link.Rel == "alternate" {
 					item.Link = link.Href
 					break
 				}
