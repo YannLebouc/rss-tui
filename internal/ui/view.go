@@ -7,6 +7,10 @@ import (
 )
 
 func renderFeeds(model Model) tea.View {
+	if len(model.feeds) == 0 {
+		return tea.NewView("No feeds available")
+	}
+
 	s := "Press enter to view the feed articles :\n\n"
 
 	for i, feed := range model.feeds {
@@ -23,6 +27,10 @@ func renderFeeds(model Model) tea.View {
 }
 
 func renderArticles(model Model) tea.View {
+	if len(model.feeds[model.selectedFeed].Items) == 0 {
+		return tea.NewView("No articles available")
+	}
+
 	s := "Press ENTER to open the article, press ESC to go back to feeds list\n\n"
 
 	articles := model.feeds[model.selectedFeed].Items
