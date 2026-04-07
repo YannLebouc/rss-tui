@@ -57,8 +57,8 @@ Goal: download RSS feeds from URLs.
 
 ### Feed refresh
 
-- [ ] Refresh one feed
 - [x] Refresh all feeds from config
+- [ ] Refresh one feed
 
 ---
 
@@ -83,77 +83,20 @@ Goal: extract items from feed content.
 
 ---
 
-## Phase 5 — Local storage (SQLite)
-
-Goal: persist feeds and items locally.
-
-### Database setup
-
-- [ ] Choose database location
-- [ ] Create database on startup
-- [ ] Create initial schema
-- [ ] Implement simple migrations
-
-### Feeds table
-
-- [ ] Store feed URL
-- [ ] Store feed title
-- [ ] Store tags
-- [ ] Store last fetch timestamp
-- [ ] Store ETag / Last-Modified (optional for now)
-
-### Items table
-
-- [ ] Store item title
-- [ ] Store item link
-- [ ] Store publication date
-- [ ] Store GUID
-- [ ] Link item to feed
-
-### Read state
-
-- [ ] Add read/unread flag
-- [ ] Add read timestamp
-
----
-
-## Phase 6 — Store fetched items
-
-Goal: save parsed items into database.
-
-- [ ] Insert feed if not present
-- [ ] Insert new items
-- [ ] Skip duplicates
-- [ ] Update feed last fetch time
-
----
-
 ## Phase 7 — CLI reader
 
 Goal: basic reading workflow without full TUI.
 
 ### Commands
 
-- [ ] `rss-tui refresh`
-- [ ] `rss-tui feeds`
-- [ ] `rss-tui list`
+- [ ] `run app`
 
 ### Output
 
-- [ ] List feeds
-- [ ] List items for a feed
-- [ ] Display unread marker
+- [x] List feeds
+- [x] List items for a feed
 - [ ] Show item date
-
----
-
-## Phase 8 — Mark items as read
-
-Goal: basic reading workflow.
-
-- [ ] Add command to mark item as read
-- [ ] Update read state in database
-- [ ] Display unread count per feed
+- [ ] Convert HTML content to text
 
 ---
 
@@ -163,22 +106,23 @@ Goal: interactive terminal interface.
 
 ### Layout
 
-- [ ] Feed list view
-- [ ] Item list view
+- [x] Feed list view
+- [x] Item list view
+- [x] Item details view
 
 ### Navigation
 
-- [ ] Keyboard navigation
-- [ ] Move up/down
-- [ ] Select feed
-- [ ] Select item
+- [x] Keyboard navigation
+- [x] Move up/down
+- [x] Select feed
+- [x] Select item
+- [x] Go back to previous view
 
 ### Actions
 
 - [ ] Open item link in browser
-- [ ] Mark item read/unread
-- [ ] Refresh feeds
-- [ ] Quit application
+- [x] Refresh feeds
+- [x] Quit application
 
 ---
 
@@ -194,10 +138,10 @@ Goal: interactive terminal interface.
 
 ## Future improvements
 
-- [ ] Global unread view
-- [ ] Feed categories
-- [ ] OPML import/export
-- [ ] Auto refresh
 - [ ] Parallel feed fetching
-- [ ] Search
-- [ ] Item preview
+- [ ] Local storage with SQLite
+- [ ] Mark item read/unread
+- [ ] Global unread view
+- [ ] Auto refresh
+- [ ] Feed categories
+- [ ] Improve UI
