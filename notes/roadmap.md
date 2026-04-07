@@ -22,8 +22,7 @@ Goal: build a solid, usable, local RSS reader with a simple terminal workflow.
 
 ### Feed management
 
-- Add a feed from a URL
-- Remove a feed
+- Manage feeds through a configuration file
 - List configured feeds
 - Store feeds locally
 - Support optional feed tags / categories
@@ -42,7 +41,6 @@ Goal: build a solid, usable, local RSS reader with a simple terminal workflow.
 - List items for a selected feed
 - Show item title, source and publication date
 - Mark item as read / unread
-- Show unread count per feed
 - Open item link in the browser
 
 ### Persistence
@@ -58,6 +56,7 @@ Goal: build a solid, usable, local RSS reader with a simple terminal workflow.
 - Keyboard navigation
 - Basic feed list view
 - Basic item list view
+- Basic item details view
 - Minimal and clear terminal interface
 
 ### Quality
@@ -83,6 +82,7 @@ Goal: make the reader more comfortable and pleasant for regular use.
 
 ### Fetching improvements
 
+- Parallel fetching
 - HTTP cache support (`ETag`, `Last-Modified`)
 - Better duplicate detection
 - Better refresh feedback and status
@@ -90,29 +90,23 @@ Goal: make the reader more comfortable and pleasant for regular use.
 
 ### Reading workflow
 
-- Item preview / detail view in the TUI
 - Mark all items in a feed as read
 - Mark all visible items as read
 - Better visual distinction between read and unread items
 
 ### UX improvements
 
-- Better keybindings
 - Help screen
-- Status bar
+- Clean status bar
 - Confirmation prompts for destructive actions
 
 ### Import / export
 
-- Export configured feeds
 - Import feeds from a simple config file
-- OPML import
-- OPML export
 
 ### Quality/tests
 
 - More tests
-- Better internal boundaries
 - Improved database schema and migrations
 - Better error messages
 
@@ -130,20 +124,15 @@ These ideas are interesting, but not required for the project to be successful.
 - Offline article content storage
 - Read-it-later integration
 - Feed grouping by folders
-- Import from other readers
-- Export reading history
 
 ### TUI enhancements
 
-- Multi-pane layout
 - Vim-like navigation
 - Theme support
 - Mouse support
-- Custom keybindings
 
 ### Technical / backend ideas
 
-- Parallel feed fetching
 - Advanced caching strategy
 - Pluggable storage
 - Local HTTP API
