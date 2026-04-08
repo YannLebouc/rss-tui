@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	tea "charm.land/bubbletea/v2"
+	"github.com/charmbracelet/lipgloss"
 	"jaytaylor.com/html2text"
 )
 
@@ -19,12 +20,14 @@ func renderFeeds(model Model) tea.View {
 		if model.cursor == i {
 			cursor = ">" // cursor!
 		}
+
 		s += fmt.Sprintf("%s %s\n", cursor, feed.Title)
 	}
 
 	s += "\nPress q to quit.\n"
 
-	return tea.NewView(s)
+	styledString := lipgloss.NewStyle().Width(model.width).Render(s)
+	return tea.NewView(styledString)
 }
 
 func renderArticles(model Model) tea.View {
@@ -46,13 +49,18 @@ func renderArticles(model Model) tea.View {
 
 	s += "\nPress q to quit.\n"
 
-	return tea.NewView(s)
+	styledString := lipgloss.NewStyle().Width(model.width).Render(s)
+	return tea.NewView(styledString)
 }
 
 func renderArticleDetail(model Model) tea.View {
 	article := model.feeds[model.selectedFeed].Items[model.selectedArticle]
 
 	title, err := html2text.FromString(article.Title, html2text.Options{PrettyTables: true})
+	if err != nil {
+		panic(err)
+	}
+
 	content, err := html2text.FromString(article.Content, html2text.Options{PrettyTables: true})
 	if err != nil {
 		panic(err)
@@ -63,7 +71,8 @@ func renderArticleDetail(model Model) tea.View {
 	s += fmt.Sprintf("%s\n\n", content)
 	s += "\nPress q to quit.\n"
 
-	return tea.NewView(s)
+	styledString := lipgloss.NewStyle().Width(model.width).Render(s)
+	return tea.NewView(styledString)
 }
 
 func (m Model) View() tea.View {

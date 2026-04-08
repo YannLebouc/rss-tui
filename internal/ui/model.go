@@ -14,6 +14,8 @@ const (
 )
 
 type Model struct {
+	width           int
+	height          int
 	feeds           []feeds.Feed
 	mode            Mode
 	selectedFeed    int
