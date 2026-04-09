@@ -96,8 +96,10 @@ Goal: basic reading workflow without full TUI.
 - [x] List feeds
 - [x] List items for a feed
 - [ ] Show item date
-- [ ] Convert HTML content to text
-
+- [x] Convert HTML content to text
+- [ ] Handle text wrapping
+- [ ] Mouse scrolling available on article details
+      
 ---
 
 ## Phase 9 — Basic TUI
