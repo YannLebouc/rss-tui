@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/YannLebouc/rss-tui/internal/feeds"
+	"jaytaylor.com/html2text"
 )
 
 type Fetcher struct {
@@ -20,6 +21,14 @@ func NewFetcher() *Fetcher {
 			Timeout: 10 * time.Second,
 		},
 	}
+}
+
+func safeHtmlToText(input string) (output string) {
+	output, err := html2text.FromString(input, html2text.Options{})
+	if err != nil {
+		return input
+	}
+	return output
 }
 
 func (f *Fetcher) Fetch(url string) (feeds.Feed, error) {
@@ -52,15 +61,15 @@ func (f *Fetcher) Fetch(url string) (feeds.Feed, error) {
 			return feeds.Feed{}, err
 		}
 
-		feed.Title = rssFeed.Channel.Title
+		feed.Title = safeHtmlToText(rssFeed.Channel.Title)
 		feed.Link = rssFeed.Channel.Link
 		feed.Date = rssFeed.Channel.PubDate
 
 		for _, rssItem := range rssFeed.Channel.Items {
 			item := feeds.Item{}
 
-			item.Title = rssItem.Title
-			item.Content = rssItem.Description
+			item.Title = safeHtmlToText(rssItem.Title)
+			item.Content = safeHtmlToText(rssItem.Description)
 			item.Link = rssItem.Link
 			item.Date = rssItem.PubDate
 
@@ -73,10 +82,10 @@ func (f *Fetcher) Fetch(url string) (feeds.Feed, error) {
 			return feeds.Feed{}, err
 		}
 
-		feed.Title = atomFeed.Title
+		feed.Title = safeHtmlToText(atomFeed.Title)
 		feed.Date = atomFeed.Updated
 		for _, link := range atomFeed.Links {
-			if link.Rel == "alternate" {
+			if link.Rel == "alternate" || link.Rel == "" {
 				feed.Link = link.Href
 				break
 			}
@@ -85,12 +94,12 @@ func (f *Fetcher) Fetch(url string) (feeds.Feed, error) {
 		for _, entry := range atomFeed.Entries {
 			item := feeds.Item{}
 
-			item.Title = entry.Title
+			item.Title = safeHtmlToText(entry.Title)
 
 			if entry.Content != "" {
-				item.Content = entry.Content
+				item.Content = safeHtmlToText(entry.Content)
 			} else {
-				item.Content = entry.Summary
+				item.Content = safeHtmlToText(entry.Summary)
 			}
 
 			item.Date = entry.Updated
