@@ -1,18 +1,32 @@
 package ui
 
 import (
+	"charm.land/bubbles/v2/viewport"
 	tea "charm.land/bubbletea/v2"
+	"github.com/charmbracelet/lipgloss"
 )
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+
+	var cmd tea.Cmd
+
 	switch msg := msg.(type) {
 
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
-		
-	case tea.KeyPressMsg:
+		if !m.ready {
+			m.viewport = viewport.New(viewport.WithWidth(msg.Width), viewport.WithHeight(msg.Height))
+			m.ready = true
+		} else {
+			m.viewport.SetWidth(msg.Width)
+			m.viewport.SetHeight(msg.Height)
+		}
+		if m.mode == ARTICLE_DETAIL {
+			m.viewport.SetContent(buildArticleContent(m))
+		}
 
+	case tea.KeyPressMsg:
 		switch msg.String() {
 
 		// Quitting the app
@@ -53,6 +67,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case ARTICLES_LIST:
 				m.selectedArticle = m.cursor
 				m.mode = ARTICLE_DETAIL
+
+				content := buildArticleContent(m)
+				m.viewport.SetContent(content)
+				m.viewport.GotoTop()
 			}
 
 		// Going back to previous view
@@ -83,7 +101,31 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.loading = false
 	}
 
+	if m.mode == ARTICLE_DETAIL {
+		m.viewport, cmd = m.viewport.Update(msg)
+		return m, cmd
+	}
 	// Return the updated model to the Bubble Tea runtime for processing.
 	// Note that we're not returning a command.
 	return m, nil
+}
+
+func buildArticleContent(m Model) string {
+	article := m.feeds[m.selectedFeed].Items[m.selectedArticle]
+
+	style := lipgloss.NewStyle().
+		Width(m.contentWidth()).
+		Padding(1, 2)
+
+	s := article.Title + "\n\n"
+	s += article.Content + "\n\n"
+
+	return style.Render(s)
+}
+
+func (m Model) contentWidth() int {
+	if m.viewport.Width() > 0 {
+		return m.viewport.Width()
+	}
+	return 80
 }

@@ -52,18 +52,6 @@ func renderArticles(model Model) tea.View {
 	return tea.NewView(styledString)
 }
 
-func renderArticleDetail(model Model) tea.View {
-	article := model.feeds[model.selectedFeed].Items[model.selectedArticle]
-
-	s := "Press ESC to go back to articles list\n\n"
-	s += fmt.Sprintf("%s\n\n", article.Title)
-	s += fmt.Sprintf("%s\n\n", article.Content)
-	s += "\nPress q to quit.\n"
-
-	styledString := lipgloss.NewStyle().Width(model.width).Render(s)
-	return tea.NewView(styledString)
-}
-
 func (m Model) View() tea.View {
 
 	if m.loading {
@@ -82,7 +70,7 @@ func (m Model) View() tea.View {
 	case ARTICLES_LIST:
 		return renderArticles(m)
 	case ARTICLE_DETAIL:
-		return renderArticleDetail(m)
+		return tea.NewView(m.viewport.View())
 	}
 
 	return tea.NewView("RSS-TUI")

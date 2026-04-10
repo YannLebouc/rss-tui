@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"charm.land/bubbles/v2/viewport"
 	tea "charm.land/bubbletea/v2"
 	"github.com/YannLebouc/rss-tui/internal/feeds"
 )
@@ -14,15 +15,19 @@ const (
 )
 
 type Model struct {
-	width           int
-	height          int
+	width    int
+	height   int
+	ready    bool
+	viewport viewport.Model
+
 	feeds           []feeds.Feed
 	mode            Mode
 	selectedFeed    int
 	selectedArticle int
 	cursor          int
-	loading         bool
-	error           error
+
+	loading bool
+	error   error
 }
 
 func InitialModel() Model {
