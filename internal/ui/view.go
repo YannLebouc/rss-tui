@@ -5,7 +5,6 @@ import (
 
 	tea "charm.land/bubbletea/v2"
 	"github.com/charmbracelet/lipgloss"
-	"jaytaylor.com/html2text"
 )
 
 func renderFeeds(model Model) tea.View {
@@ -56,19 +55,9 @@ func renderArticles(model Model) tea.View {
 func renderArticleDetail(model Model) tea.View {
 	article := model.feeds[model.selectedFeed].Items[model.selectedArticle]
 
-	title, err := html2text.FromString(article.Title, html2text.Options{PrettyTables: true})
-	if err != nil {
-		panic(err)
-	}
-
-	content, err := html2text.FromString(article.Content, html2text.Options{PrettyTables: true})
-	if err != nil {
-		panic(err)
-	}
-
 	s := "Press ESC to go back to articles list\n\n"
-	s += fmt.Sprintf("%s\n\n", title)
-	s += fmt.Sprintf("%s\n\n", content)
+	s += fmt.Sprintf("%s\n\n", article.Title)
+	s += fmt.Sprintf("%s\n\n", article.Content)
 	s += "\nPress q to quit.\n"
 
 	styledString := lipgloss.NewStyle().Width(model.width).Render(s)
