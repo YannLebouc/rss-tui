@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"fmt"
+
 	"charm.land/bubbles/v2/viewport"
 	tea "charm.land/bubbletea/v2"
 	"github.com/charmbracelet/lipgloss"
@@ -33,20 +35,20 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c", "q":
 			return m, tea.Quit
 
-		// Moving cursor up
+		// Move up
 		case "up", "k":
 			if m.cursor > 0 {
 				m.cursor--
 			}
 
-		// Moving cursor down
+		// Move down
 		case "down", "j":
-			if m.mode == FEEDS_LIST {
+			switch m.mode {
+			case FEEDS_LIST:
 				if m.cursor < len(m.feeds)-1 {
 					m.cursor++
 				}
-			}
-			if m.mode == ARTICLES_LIST {
+			case ARTICLES_LIST:
 				if m.cursor < len(m.feeds[m.selectedFeed].Items)-1 {
 					m.cursor++
 				}
@@ -117,8 +119,12 @@ func buildArticleContent(m Model) string {
 		Width(m.contentWidth()).
 		Padding(1, 2)
 
-	s := article.Title + "\n\n"
-	s += article.Content + "\n\n"
+	s := fmt.Sprintf("%s\n\n%s\n\n[%d/%d]",
+		article.Title,
+		article.Content,
+		m.selectedArticle+1,
+		len(m.feeds[m.selectedFeed].Items),
+	)
 
 	return style.Render(s)
 }

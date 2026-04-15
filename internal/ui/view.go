@@ -4,52 +4,57 @@ import (
 	"fmt"
 
 	tea "charm.land/bubbletea/v2"
-	"github.com/charmbracelet/lipgloss"
 )
 
-func renderFeeds(model Model) tea.View {
-	if len(model.feeds) == 0 {
+func renderFeeds(m Model) tea.View {
+	if len(m.feeds) == 0 {
 		return tea.NewView("No feeds available")
 	}
 
-	s := "Press enter to view the feed articles :\n\n"
+	s := "Select a feed (ENTER)\n\n"
 
-	for i, feed := range model.feeds {
-		cursor := " " // no cursor
-		if model.cursor == i {
-			cursor = ">" // cursor!
+	height := m.height - 4 // marge header/footer
+	start, end := visibleRange(m.cursor, len(m.feeds), height)
+
+	for i := start; i < end; i++ {
+		cursor := " "
+		if i == m.cursor {
+			cursor = ">"
 		}
 
-		s += fmt.Sprintf("%s %s\n", cursor, feed.Title)
+		s += fmt.Sprintf("%s %s\n", cursor, m.feeds[i].Title)
 	}
 
-	s += "\nPress q to quit.\n"
+	s += "\nq: quit • ↑/↓: navigate • enter: select\n"
 
-	styledString := lipgloss.NewStyle().Width(model.width).Render(s)
-	return tea.NewView(styledString)
+	return tea.NewView(s)
 }
 
-func renderArticles(model Model) tea.View {
-	if len(model.feeds[model.selectedFeed].Items) == 0 {
+func renderArticles(m Model) tea.View {
+	articles := m.feeds[m.selectedFeed].Items
+
+	if len(articles) == 0 {
 		return tea.NewView("No articles available")
 	}
 
-	s := "Press ENTER to open the article, press ESC to go back to feeds list\n\n"
+	s := "Articles (ENTER to open, ESC to go back)\n\n"
 
-	articles := model.feeds[model.selectedFeed].Items
+	height := m.height - 4
+	start, end := visibleRange(m.cursor, len(articles), height)
 
-	for i, article := range articles {
-		cursor := " " // no cursor
-		if model.cursor == i {
-			cursor = ">" // cursor!
+	for i := start; i < end; i++ {
+		cursor := " "
+		if i == m.cursor {
+			cursor = ">"
 		}
-		s += fmt.Sprintf("%s %s\n", cursor, article.Title)
+
+		title := truncate(articles[i].Title, m.width-4)
+		s += fmt.Sprintf("%s %s\n", cursor, title)
 	}
 
-	s += "\nPress q to quit.\n"
+	s += "\nq: quit • ↑/↓: navigate • enter: open • esc: back\n"
 
-	styledString := lipgloss.NewStyle().Width(model.width).Render(s)
-	return tea.NewView(styledString)
+	return tea.NewView(s)
 }
 
 func (m Model) View() tea.View {
@@ -74,4 +79,35 @@ func (m Model) View() tea.View {
 	}
 
 	return tea.NewView("RSS-TUI")
+}
+
+func visibleRange(cursor, total, height int) (start, end int) {
+	if height <= 0 {
+		return 0, total
+	}
+
+	half := height / 2
+
+	start = cursor - half
+	if start < 0 {
+		start = 0
+	}
+
+	end = start + height
+	if end > total {
+		end = total
+		start = max(0, end-height)
+	}
+
+	return start, end
+}
+
+func truncate(s string, max int) string {
+	if len(s) <= max {
+		return s
+	}
+	if max <= 3 {
+		return s[:max]
+	}
+	return s[:max-3] + "..."
 }
