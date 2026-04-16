@@ -8,7 +8,8 @@ import (
 	"time"
 
 	"github.com/YannLebouc/rss-tui/internal/feeds"
-	"jaytaylor.com/html2text"
+	"github.com/YannLebouc/rss-tui/internal/mapper"
+	"github.com/YannLebouc/rss-tui/internal/parser"
 )
 
 type Fetcher struct {
@@ -23,14 +24,6 @@ func NewFetcher() *Fetcher {
 	}
 }
 
-func safeHtmlToText(input string) (output string) {
-	output, err := html2text.FromString(input, html2text.Options{})
-	if err != nil {
-		return input
-	}
-	return output
-}
-
 func (f *Fetcher) Fetch(url string) (feeds.Feed, error) {
 	response, err := f.httpClient.Get(url)
 	if err != nil {
@@ -42,8 +35,8 @@ func (f *Fetcher) Fetch(url string) (feeds.Feed, error) {
 		return feeds.Feed{}, fmt.Errorf("unexpected status code %d for %s", response.StatusCode, url)
 	}
 
-	root := feeds.Root{}
-	feed := feeds.Feed{}
+	var root feeds.Root
+	var feed feeds.Feed
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
@@ -56,62 +49,19 @@ func (f *Fetcher) Fetch(url string) (feeds.Feed, error) {
 
 	switch root.XMLName.Local {
 	case "rss":
-		rssFeed := feeds.RssFeed{}
-		if err := xml.Unmarshal(body, &rssFeed); err != nil {
+		rssFeed, err := parser.ParseRssFeed(body)
+		if err != nil {
 			return feeds.Feed{}, err
 		}
-
-		feed.Title = safeHtmlToText(rssFeed.Channel.Title)
-		feed.Link = rssFeed.Channel.Link
-		feed.Date = rssFeed.Channel.PubDate
-
-		for _, rssItem := range rssFeed.Channel.Items {
-			item := feeds.Item{}
-
-			item.Title = safeHtmlToText(rssItem.Title)
-			item.Content = safeHtmlToText(rssItem.Description)
-			item.Link = rssItem.Link
-			item.Date = rssItem.PubDate
-
-			feed.Items = append(feed.Items, item)
-		}
+		feed = mapper.RssFeedToGenericFeed(rssFeed)
 
 	case "feed":
-		atomFeed := feeds.AtomFeed{}
-		if err := xml.Unmarshal(body, &atomFeed); err != nil {
+		atomFeed, err := parser.ParseAtomFeed(body)
+		if err != nil {
 			return feeds.Feed{}, err
 		}
-
-		feed.Title = safeHtmlToText(atomFeed.Title)
-		feed.Date = atomFeed.Updated
-		for _, link := range atomFeed.Links {
-			if link.Rel == "alternate" || link.Rel == "" {
-				feed.Link = link.Href
-				break
-			}
-		}
-
-		for _, entry := range atomFeed.Entries {
-			item := feeds.Item{}
-
-			item.Title = safeHtmlToText(entry.Title)
-
-			if entry.Content != "" {
-				item.Content = safeHtmlToText(entry.Content)
-			} else {
-				item.Content = safeHtmlToText(entry.Summary)
-			}
-
-			item.Date = entry.Updated
-			for _, link := range entry.Links {
-				if link.Rel == "alternate" {
-					item.Link = link.Href
-					break
-				}
-			}
-
-			feed.Items = append(feed.Items, item)
-		}
+		feed = mapper.AtomFeedToGenericFeed(atomFeed)
 	}
+
 	return feed, nil
 }
