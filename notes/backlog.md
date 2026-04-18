@@ -54,11 +54,11 @@ Goal: download RSS feeds from URLs.
 - [x] Fetch feed from URL
 - [x] Handle HTTP errors
 - [x] Return raw feed content
+- [ ] Parallel feed fetching
 
 ### Feed refresh
 
 - [x] Refresh all feeds from config
-- [ ] Refresh one feed
 
 ---
 
@@ -95,10 +95,8 @@ Goal: basic reading workflow without full TUI.
 
 - [x] List feeds
 - [x] List items for a feed
-- [ ] Show item date
 - [x] Convert HTML content to text
-- [ ] Handle text wrapping
-- [ ] Mouse scrolling available on article details
+- [x] Handle text wrapping
       
 ---
 
@@ -122,7 +120,6 @@ Goal: interactive terminal interface.
 
 ### Actions
 
-- [ ] Open item link in browser
 - [x] Refresh feeds
 - [x] Quit application
 
@@ -132,18 +129,7 @@ Goal: interactive terminal interface.
 
 - [ ] Improve error messages
 - [ ] Improve logging
+- [ ] Basic tests
 - [ ] Improve code organization
-- [ ] Add basic tests
 - [ ] Clean up README
 
----
-
-## Future improvements
-
-- [ ] Parallel feed fetching
-- [ ] Local storage with SQLite
-- [ ] Mark item read/unread
-- [ ] Global unread view
-- [ ] Auto refresh
-- [ ] Feed categories
-- [ ] Improve UI
