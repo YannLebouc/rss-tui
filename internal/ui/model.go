@@ -4,6 +4,7 @@ import (
 	"charm.land/bubbles/v2/viewport"
 	tea "charm.land/bubbletea/v2"
 	"github.com/YannLebouc/rss-tui/internal/feeds"
+	"github.com/YannLebouc/rss-tui/internal/service"
 )
 
 type Mode int
@@ -20,6 +21,7 @@ type Model struct {
 	ready    bool
 	viewport viewport.Model
 
+	service         *service.FeedService
 	feeds           []feeds.Feed
 	mode            Mode
 	selectedFeed    int
@@ -30,13 +32,14 @@ type Model struct {
 	error   error
 }
 
-func InitialModel() Model {
+func InitialModel(service *service.FeedService) Model {
 	return Model{
+		service: service,
 		loading: true,
 		mode:    FEEDS_LIST,
 	}
 }
 
 func (m Model) Init() tea.Cmd {
-	return LoadFeeds
+	return LoadFeeds(m.service)
 }

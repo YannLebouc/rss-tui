@@ -57,7 +57,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// refreshing feeds
 		case "r":
 			m.loading = true
-			return m, LoadFeeds
+			return m, LoadFeeds(m.service)
 
 		// Selecting a feed or an article
 		case "enter":

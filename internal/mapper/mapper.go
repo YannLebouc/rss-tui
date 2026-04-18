@@ -2,21 +2,21 @@ package mapper
 
 import (
 	"github.com/YannLebouc/rss-tui/internal/feeds"
-	"jaytaylor.com/html2text"
+	"github.com/YannLebouc/rss-tui/internal/processor"
 )
 
 func RssFeedToGenericFeed(rssFeed feeds.RssFeed) feeds.Feed {
 	feed := feeds.Feed{}
 
-	feed.Title = safeHtmlToText(rssFeed.Channel.Title)
+	feed.Title = processor.SafeHtmlToText(rssFeed.Channel.Title)
 	feed.Link = rssFeed.Channel.Link
 	feed.Date = rssFeed.Channel.PubDate
 
 	for _, rssItem := range rssFeed.Channel.Items {
 		item := feeds.Item{}
 
-		item.Title = safeHtmlToText(rssItem.Title)
-		item.Content = safeHtmlToText(rssItem.Description)
+		item.Title = processor.SafeHtmlToText(rssItem.Title)
+		item.Content = processor.SafeHtmlToText(rssItem.Description)
 		item.Link = rssItem.Link
 		item.Date = rssItem.PubDate
 
@@ -30,7 +30,7 @@ func AtomFeedToGenericFeed(atomFeed feeds.AtomFeed) feeds.Feed {
 
 	feed := feeds.Feed{}
 
-	feed.Title = safeHtmlToText(atomFeed.Title)
+	feed.Title = processor.SafeHtmlToText(atomFeed.Title)
 	feed.Date = atomFeed.Updated
 	for _, link := range atomFeed.Links {
 		if link.Rel == "alternate" || link.Rel == "" {
@@ -42,12 +42,12 @@ func AtomFeedToGenericFeed(atomFeed feeds.AtomFeed) feeds.Feed {
 	for _, entry := range atomFeed.Entries {
 		item := feeds.Item{}
 
-		item.Title = safeHtmlToText(entry.Title)
+		item.Title = processor.SafeHtmlToText(entry.Title)
 
 		if entry.Content != "" {
-			item.Content = safeHtmlToText(entry.Content)
+			item.Content = processor.SafeHtmlToText(entry.Content)
 		} else {
-			item.Content = safeHtmlToText(entry.Summary)
+			item.Content = processor.SafeHtmlToText(entry.Summary)
 		}
 
 		item.Date = entry.Updated
@@ -62,12 +62,4 @@ func AtomFeedToGenericFeed(atomFeed feeds.AtomFeed) feeds.Feed {
 	}
 
 	return feed
-}
-
-func safeHtmlToText(input string) (output string) {
-	output, err := html2text.FromString(input, html2text.Options{})
-	if err != nil {
-		return input
-	}
-	return output
 }
