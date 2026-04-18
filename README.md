@@ -7,23 +7,15 @@ An RSS feed reader inside your terminal, retrieves data from multiples feeds to 
 - Installation
 - Usage
 - Technologies used
-- Contributing
 - License
 
 ### Features
 
-- Manage feeds (add/remove/list)
+- Display feeds list
+- Display articles from a feed
+- Read an article details
 - Manual refresh
-- Unread/read tracking
 - Keyboard-driven TUI navigation
-- Local storage (config + state)
-
-#### Planned
-
-- Categories/tags for feeds
-- Global “Unread” view
-- Sorting/filtering
-- Auto-refresh
 
 ### Installation
 Work in progress 🚧
@@ -43,10 +35,6 @@ You will find a `feeds` file template with guidelines at the root of this reposi
 
 ### Technologies used
 - Go
-- SQLite
-
-### Contributing
-Work in progress 🚧
 
 ### License
 This project is licensed under the MIT license.
