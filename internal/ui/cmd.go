@@ -1,6 +1,9 @@
 package ui
 
 import (
+	"fmt"
+	"time"
+
 	tea "charm.land/bubbletea/v2"
 	"github.com/YannLebouc/rss-tui/internal/config"
 	"github.com/YannLebouc/rss-tui/internal/feeds"
@@ -19,18 +22,38 @@ func LoadFeeds(feedService *service.FeedService) tea.Cmd {
 			return ErrMsg{err}
 		}
 
-		var result = []feeds.Feed{}
+		type GetFeedResult struct {
+			Feed feeds.Feed
+			Err  error
+		}
+
+		var feeds = []feeds.Feed{}
+
+		ch := make(chan GetFeedResult, len(configLines))
 
 		for _, line := range configLines {
-			feed, err := feedService.GetFeed(line.URL)
-			if err != nil {
-				return ErrMsg{err}
+			go func(url string) {
+				feed, err := feedService.GetFeed(url)
+				ch <- GetFeedResult{Feed: feed, Err: err}
+			}(line.URL)
+		}
+
+		timeout := time.After(time.Second * 5)
+
+		for i := 0; i < len(configLines); i++ {
+			select {
+			case result := <-ch:
+				if result.Err != nil {
+					return ErrMsg{err}
+				}
+				feeds = append(feeds, result.Feed)
+			case <-timeout:
+				return ErrMsg{fmt.Errorf("timeout while fetching feeds")}
 			}
-			result = append(result, feed)
 		}
 
 		return FeedsLoadedMsg{
-			Feeds: result,
+			Feeds: feeds,
 		}
 	}
 }
