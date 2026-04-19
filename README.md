@@ -1,40 +1,88 @@
 # RSS-TUI
 
-An RSS feed reader inside your terminal, retrieves data from multiples feeds to get the freshest news in a minimalistic interface
+A terminal-based RSS feed reader built in Go.  
+Browse your feeds and read articles directly from your terminal.
 
-## Table of content
-- Features
-- Installation
-- Usage
-- Technologies used
-- License
+---
 
-### Features
+## Features
 
-- Display feeds list
-- Display articles from a feed
-- Read an article details
+- Display list of RSS feeds
+- Browse articles per feed
+- Read full article content
+- Keyboard-driven navigation
 - Manual refresh
-- Keyboard-driven TUI navigation
 
-### Installation
-Work in progress 🚧
+---
 
-### Usage
-Work in progress 🚧
+## Requirements
 
-#### Setup your RSS feeds in a configuration file 
-You will find a `feeds` file template with guidelines at the root of this repository
+- Go 1.25+
 
-##### Linux
-- The path of your `feeds` file should be : `$HOME/.config/rss-tui/feeds`.
-- You might also use `$XDG_CONFIG_HOME/rss-tui/feeds` path based on your preference
+---
 
-##### Windows
-- The path of your `feeds` file should be : `%USERPROFILE%\.config\rss-tui\feeds`.
+## Installation
 
-### Technologies used
-- Go
+```bash
+go install github.com/YannLebouc/rss-tui/cmd/rss-tui@latest
+````
 
-### License
-This project is licensed under the MIT license.
+---
+
+## Usage
+
+Create a config file:
+
+A config file example is available at the project's root
+
+### Linux
+
+```
+$HOME/.config/rss-tui/feeds
+```
+
+### Windows
+
+```
+%USERPROFILE%\.config\rss-tui\feeds
+```
+
+### Example format
+
+```
+https://example.com/rss.xml
+https://another-site.com/feed
+```
+
+Then run:
+
+```bash
+rss-tui
+```
+
+---
+
+## Controls
+
+* `j / k` → navigate
+* `enter` → select
+* `esc` → back
+* `r` → refresh
+* `q` → quit
+
+---
+
+## Technologies
+
+* Go
+* Bubble Tea
+* Bubbles
+* Lipgloss
+* html2text
+
+---
+
+## License
+
+MIT
+

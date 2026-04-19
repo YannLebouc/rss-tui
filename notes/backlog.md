@@ -54,7 +54,7 @@ Goal: download RSS feeds from URLs.
 - [x] Fetch feed from URL
 - [x] Handle HTTP errors
 - [x] Return raw feed content
-- [ ] Parallel feed fetching
+- [x] Parallel feed fetching
 
 ### Feed refresh
 
@@ -127,9 +127,6 @@ Goal: interactive terminal interface.
 
 ## Phase 10 — Polishing
 
-- [ ] Improve error messages
-- [ ] Improve logging
-- [ ] Basic tests
-- [ ] Improve code organization
-- [ ] Clean up README
+- [x] Improve code organization
+- [x] Clean up README
 
